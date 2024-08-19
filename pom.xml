@@ -48,6 +48,10 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>com.azure.tools</groupId>
+				<artifactId>azure-sdk-build-tool</artifactId>
+			</plugin>
 		</plugins>
 	</build>
 
