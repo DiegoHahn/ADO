@@ -36,13 +36,13 @@ public class AzureDevOpsClient {
         return response.body();
     }
 
-    public String updateWorkItem(String Query) throws Exception {
-        String wiqlUrl = organizationUrl + "/_apis/wit/wiql?api-version=7.0";
+    public String updateWorkItem(int  workItemId, String Query) throws Exception {
+        String wiqlUrl = organizationUrl + "/ADO%20Rest/_apis/wit/workitems/" + workItemId + "?api-version=7.0";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(wiqlUrl))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(Query))
                 .header("Authorization", authenticator.getAuthHeader())
-                .header("Content-Type", "application/json")
+                .header("Content-Type", "application/json-patch+json")
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
