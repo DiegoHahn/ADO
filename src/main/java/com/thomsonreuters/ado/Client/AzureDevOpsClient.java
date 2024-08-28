@@ -11,15 +11,19 @@ public class AzureDevOpsClient {
     private final String organizationUrl;
     private final AzureDevOpsAuthenticator authenticator;
     private final HttpClient client;
+    private final String analyticsOrganizationUrl;
+    private final String projectName;
 
-    public AzureDevOpsClient(String organizationUrl, AzureDevOpsAuthenticator authenticator) {
+    public AzureDevOpsClient(String organizationUrl, AzureDevOpsAuthenticator authenticator, String analyticsOrganizationUrl, String projectName) {
         this.organizationUrl = organizationUrl;
+        this.analyticsOrganizationUrl = analyticsOrganizationUrl;
         this.authenticator = authenticator;
         this.client = HttpClient.newHttpClient();
+        this.projectName = projectName;
     }
 
     public String getWorItems(String userStoryID) throws Exception {
-        String wiqlUrl = organizationUrl + "/ADO%20Rest/_apis/wit/workitems/" + userStoryID +"?api-version=7.0&$expand=relations";
+        String wiqlUrl =analyticsOrganizationUrl + projectName + "_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType&$filter=WorkItemId eq " + userStoryID + "&$expand=Links($select=TargetWorkItemId;$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,State,AssignedToUserSK))";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(wiqlUrl))
                 .header("Authorization", authenticator.getAuthHeader())
@@ -34,6 +38,24 @@ public class AzureDevOpsClient {
 
         return response.body();
     }
+
+public String runWiqlQuery(String query) throws Exception {
+    String wiqlUrl = organizationUrl +"/_apis/wit/wiql?api-version=7.0";
+    HttpRequest request = HttpRequest.newBuilder()
+            .uri(new URI(wiqlUrl))
+            .header("Authorization", authenticator.getAuthHeader())
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(query))
+            .build();
+
+    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+    if (response.statusCode() != 200) {
+        throw new Exception("Failed to execute WIQL query: " + response.body());
+    }
+
+    return response.body();
+}
 
     public void updateWorkItem(int  workItemId, String Query) throws Exception {
         String wiqlUrl = organizationUrl + "/ADO%20Rest/_apis/wit/workitems/" + workItemId + "?api-version=7.0";
