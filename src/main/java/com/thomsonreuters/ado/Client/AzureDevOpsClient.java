@@ -13,19 +13,29 @@ public class AzureDevOpsClient {
     private final HttpClient client;
     private final String analyticsOrganizationUrl;
     private final String projectName;
+    private final String userSK;
+    private final String userEmail;
 
-    public AzureDevOpsClient(String organizationUrl, AzureDevOpsAuthenticator authenticator, String analyticsOrganizationUrl, String projectName) {
+    public AzureDevOpsClient(String organizationUrl, AzureDevOpsAuthenticator authenticator, String analyticsOrganizationUrl, String projectName, String userSK, String userEmail) {
         this.organizationUrl = organizationUrl;
         this.analyticsOrganizationUrl = analyticsOrganizationUrl;
         this.authenticator = authenticator;
+        this.userSK = userSK;
+        this.userEmail = userEmail;
         this.client = HttpClient.newHttpClient();
         this.projectName = projectName;
     }
 
     public String getWorItems(String userStoryID) throws Exception {
-        String wiqlUrl =analyticsOrganizationUrl + projectName + "_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType&$filter=WorkItemId eq " + userStoryID + "&$expand=Links($select=TargetWorkItemId;$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,State,AssignedToUserSK))";
+        String queryURL = analyticsOrganizationUrl + projectName
+                + "_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType"
+                + "&$filter=WorkItemId%20eq%20" + userStoryID
+                + "&$expand=Links($select=TargetWorkItemId;"
+                + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + userSK
+                //Faz sentido filtrar ja na requisição ou trazer todos os WorkItems e filtrar no código(exibição)?
+                + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,State,AssignedToUserSK))";
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(wiqlUrl))
+                .uri(new URI(queryURL))
                 .header("Authorization", authenticator.getAuthHeader())
                 .header("Content-Type", "application/json")
                 .GET().build();
@@ -39,23 +49,27 @@ public class AzureDevOpsClient {
         return response.body();
     }
 
-public String runWiqlQuery(String query) throws Exception {
-    String wiqlUrl = organizationUrl +"/_apis/wit/wiql?api-version=7.0";
-    HttpRequest request = HttpRequest.newBuilder()
-            .uri(new URI(wiqlUrl))
-            .header("Authorization", authenticator.getAuthHeader())
-            .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(query))
-            .build();
+    public String getUserSKByEmail() throws Exception {
+        String analyticsUrl = analyticsOrganizationUrl
+                + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
+                + userEmail
+                + "'&$select=UserSK";
 
-    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(analyticsUrl))
+                .header("Authorization", authenticator.getAuthHeader())
+                .header("Content-Type", "application/json")
+                .GET()
+                .build();
 
-    if (response.statusCode() != 200) {
-        throw new Exception("Failed to execute WIQL query: " + response.body());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new Exception("Failed to retrieve UserSK: " + response.body());
+        }
+
+        return response.body();
     }
-
-    return response.body();
-}
 
     public void updateWorkItem(int  workItemId, String Query) throws Exception {
         String wiqlUrl = organizationUrl + "/ADO%20Rest/_apis/wit/workitems/" + workItemId + "?api-version=7.0";
