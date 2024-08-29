@@ -1,6 +1,7 @@
 package com.thomsonreuters.ado;
 
 import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
+import com.thomsonreuters.ado.Authentication.OAuth;
 import com.thomsonreuters.ado.Client.AzureDevOpsClient;
 
 import static com.thomsonreuters.ado.service.AzureDevOpsService.UpdateWorkItemQuery;
@@ -18,6 +19,12 @@ public class AdoApplication {
 		int workItemID = 4;
 		int remainingWork = 4;
 		int completedWork = 2;
+
+//		String state = "xyz";
+//		String scope = "vso.work_full";
+//		String clientId = "B52426F3-F6CF-4828-91D1-5DC9497F1374";
+//		String authorizationEndpoint = "https://app.vssps.visualstudio.com/oauth2/authorize";
+//		String redirectUri = "http://localhost:8080";
 
 		AzureDevOpsAuthenticator authenticator = new AzureDevOpsAuthenticator(personalAccessToken);
 		AzureDevOpsClient client = new AzureDevOpsClient(organizationUrl, authenticator, analyticsOrganizationUrl, projectName);
@@ -42,5 +49,15 @@ public class AdoApplication {
 		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
 		}
+
+
+//		OAuth oauth = new OAuth(clientId, redirectUri, authorizationEndpoint);
+//		try {
+//			String response = oauth.getAuthorizationUrl(state, scope);
+//			System.out.println("Response: " + response);
+//		} catch (Exception e) {
+//			System.err.println("Error: " + e.getMessage());
+//		}
+
 	}
 }
