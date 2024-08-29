@@ -3,6 +3,8 @@ package com.thomsonreuters.ado;
 import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
 import com.thomsonreuters.ado.Client.AzureDevOpsClient;
 
+import static com.thomsonreuters.ado.service.AzureDevOpsService.UpdateWorkItemQuery;
+
 public class AdoApplication {
 
 	public static void main(String[] args) {
@@ -14,46 +16,31 @@ public class AdoApplication {
 		String userSk = "5cfc3fc9-fb2c-4809-9586-44ffce7c24ca";
 		String userEmail = "diego.29122@alunosatc.edu.br";
 		int workItemID = 4;
-		int workTimeValue = 3;
-		int completedWork = 1;
+		int remainingWork = 4;
+		int completedWork = 2;
 
 		AzureDevOpsAuthenticator authenticator = new AzureDevOpsAuthenticator(personalAccessToken);
-		AzureDevOpsClient client = new AzureDevOpsClient(organizationUrl, authenticator, analyticsOrganizationUrl, projectName, userSk, userEmail);
+		AzureDevOpsClient client = new AzureDevOpsClient(organizationUrl, authenticator, analyticsOrganizationUrl, projectName);
 
 		try {
-			String response = client.getWorItems(userStoryID);
+			String response = client.getWorItems(userStoryID, userSk);
 			System.out.println("Response: " + response);
 		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
 		}
 
-//		try {
-//			client.updateWorkItem(workItemID, UpdateWorkItemQuery(workTimeValue, completedWork));
-//		} catch (Exception e) {
-//			System.err.println("Error: " + e.getMessage());
-//		}
 		try {
-			String sk = client.getUserSKByEmail();
+			client.updateWorkItem(workItemID, UpdateWorkItemQuery(remainingWork, completedWork));
+		} catch (Exception e) {
+			System.err.println("Error: " + e.getMessage());
+		}
+
+		try {
+			String sk = client.getUserSKByEmail(userEmail);
 			System.out.println("UserSK: " + sk);
 
 		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
 		}
-	}
-
-	public static String UpdateWorkItemQuery(int workTimeValue, int completedWork) {
-		return String.format("""
-				[
-					{
-						"op": "add",
-						"path": "/fields/Microsoft.VSTS.Scheduling.RemainingWork",
-						"value": %d
-					},
-					{
-						"op": "add",
-						"path": "/fields/Microsoft.VSTS.Scheduling.CompletedWork",
-						"value": %d
-					}
-				]""", workTimeValue, completedWork);
 	}
 }

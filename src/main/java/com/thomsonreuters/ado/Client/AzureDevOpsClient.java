@@ -13,20 +13,16 @@ public class AzureDevOpsClient {
     private final HttpClient client;
     private final String analyticsOrganizationUrl;
     private final String projectName;
-    private final String userSK;
-    private final String userEmail;
 
-    public AzureDevOpsClient(String organizationUrl, AzureDevOpsAuthenticator authenticator, String analyticsOrganizationUrl, String projectName, String userSK, String userEmail) {
+    public AzureDevOpsClient(String organizationUrl, AzureDevOpsAuthenticator authenticator, String analyticsOrganizationUrl, String projectName) {
         this.organizationUrl = organizationUrl;
         this.analyticsOrganizationUrl = analyticsOrganizationUrl;
         this.authenticator = authenticator;
-        this.userSK = userSK;
-        this.userEmail = userEmail;
         this.client = HttpClient.newHttpClient();
         this.projectName = projectName;
     }
 
-    public String getWorItems(String userStoryID) throws Exception {
+    public String getWorItems(String userStoryID, String userSK) throws Exception {
         String queryURL = analyticsOrganizationUrl + projectName
                 + "_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType"
                 + "&$filter=WorkItemId%20eq%20" + userStoryID
@@ -49,7 +45,7 @@ public class AzureDevOpsClient {
         return response.body();
     }
 
-    public String getUserSKByEmail() throws Exception {
+    public String getUserSKByEmail(String userEmail) throws Exception {
         String analyticsUrl = analyticsOrganizationUrl
                 + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
                 + userEmail
@@ -72,7 +68,9 @@ public class AzureDevOpsClient {
     }
 
     public void updateWorkItem(int  workItemId, String Query) throws Exception {
-        String wiqlUrl = organizationUrl + "/ADO%20Rest/_apis/wit/workitems/" + workItemId + "?api-version=7.0";
+        String wiqlUrl = organizationUrl + projectName
+                + "_apis/wit/workitems/" + workItemId
+                + "?api-version=7.0";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(wiqlUrl))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(Query))
