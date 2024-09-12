@@ -1,11 +1,16 @@
 package com.thomsonreuters.ado.Client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
+import com.thomsonreuters.ado.Model.TargetWorkItem;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AzureDevOpsClient {
     private final String organizationUrl;
@@ -28,7 +33,6 @@ public class AzureDevOpsClient {
                 + "&$filter=WorkItemId%20eq%20" + userStoryID
                 + "&$expand=Links($select=TargetWorkItemId;"
                 + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + userSK
-                //Faz sentido filtrar ja na requisição ou trazer todos os WorkItems e filtrar no código(exibição)?
                 + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,State,AssignedToUserSK))";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(queryURL))
