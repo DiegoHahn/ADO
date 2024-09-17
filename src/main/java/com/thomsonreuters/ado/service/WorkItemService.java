@@ -33,7 +33,8 @@ public class WorkItemService {
 						targetWorkItemNode.get("AssignedToUserSK").asText(),
 						targetWorkItemNode.get("Title").asText(),
 						targetWorkItemNode.get("State").asText(),
-						targetWorkItemNode.get("OriginalEstimate").isNull() ? null : targetWorkItemNode.get("OriginalEstimate").asDouble()
+						targetWorkItemNode.get("OriginalEstimate").isNull() ? 0 : targetWorkItemNode.get("OriginalEstimate").asDouble(),
+						targetWorkItemNode.get("RemainingWork").isNull() ? 0 : targetWorkItemNode.get("RemainingWork").asDouble()
 				);
 				targetWorkItems.add(targetWorkItem);
 			}

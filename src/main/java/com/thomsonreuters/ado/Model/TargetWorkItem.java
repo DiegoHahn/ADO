@@ -6,13 +6,15 @@ public class TargetWorkItem {
     private String title;
     private String state;
     private Double originalEstimate;
+    private Double remainingWork;
 
-    public TargetWorkItem(int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate) {
+    public TargetWorkItem(int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork) {
         this.workItemId = workItemId;
         this.assignedToUserSK = assignedToUserSK;
         this.title = title;
         this.state = state;
         this.originalEstimate = originalEstimate;
+        this.remainingWork = remainingWork;
     }
 
     public int getWorkItemId() {
@@ -53,5 +55,13 @@ public class TargetWorkItem {
 
     public void setOriginalEstimate(Double originalEstimate) {
         this.originalEstimate = originalEstimate;
+    }
+
+    public Double getRemainingWork() {
+        return remainingWork;
+    }
+
+    public void setRemainingWork(Double remainingWork) {
+        this.remainingWork = remainingWork;
     }
 }

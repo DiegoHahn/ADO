@@ -33,7 +33,7 @@ public class AzureDevOpsClient {
                 + "&$filter=WorkItemId%20eq%20" + userStoryID
                 + "&$expand=Links($select=TargetWorkItemId;"
                 + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + userSK
-                + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,State,AssignedToUserSK))";
+                + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,RemainingWork,State,AssignedToUserSK))";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(queryURL))
                 .header("Authorization", authenticator.getAuthHeader())
