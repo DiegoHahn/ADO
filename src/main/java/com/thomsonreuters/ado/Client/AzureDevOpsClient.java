@@ -2,6 +2,7 @@ package com.thomsonreuters.ado.Client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
 import com.thomsonreuters.ado.Model.TargetWorkItem;
 
@@ -68,8 +69,18 @@ public class AzureDevOpsClient {
             throw new Exception("Failed to retrieve UserSK: " + response.body());
         }
 
-        return response.body();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(response.body());
+        JsonNode valueNode = rootNode.path("value");
+        if (valueNode.isArray() && !valueNode.isEmpty()) {
+            String userSK = valueNode.get(0).path("UserSK").asText();
+            if (!userSK.isEmpty()) {
+                return userSK;
+            }
+        }
+        throw new Exception("UserSK not found in the response");
     }
+
 
     public void updateWorkItem(int  workItemId, String Query) throws Exception {
         String wiqlUrl = organizationUrl + projectName

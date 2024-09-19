@@ -1,4 +1,4 @@
-package com.thomsonreuters.ado.service;
+package com.thomsonreuters.ado.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

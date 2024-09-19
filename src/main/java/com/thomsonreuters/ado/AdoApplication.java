@@ -6,8 +6,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import static com.thomsonreuters.ado.service.WorkItemService.UpdateWorkItemQuery;
-
 @SpringBootApplication
 public class AdoApplication {
 
