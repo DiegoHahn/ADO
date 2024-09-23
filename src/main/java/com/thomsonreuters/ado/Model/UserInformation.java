@@ -3,10 +3,8 @@ package com.thomsonreuters.ado.Model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")
-
-
-public class UserConfig {
+@Table(name = "UserInformation")
+public class UserInformation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +15,9 @@ public class UserConfig {
 
     @Column(nullable = false, unique = true)
     private String userSK;
+
+    @Column (nullable = false)
+    private String board;
 
     public Long getId() {
         return id;
@@ -40,5 +41,13 @@ public class UserConfig {
 
     public void setUserSK(String userSK) {
         this.userSK = userSK;
+    }
+
+    public String getBoard() {
+        return board;
+    }
+
+    public void setBoard(String board) {
+        this.board = board;
     }
 }
