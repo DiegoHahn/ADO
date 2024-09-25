@@ -38,4 +38,16 @@ public class UserInformationController {
         response.put("userSK", userSK);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping
+    public ResponseEntity<UserInformation> getCurrentUserInformation() {
+        // como obter o usuário atual? um token de autenticação, uma sessão? LocalStorage?
+        try {
+            String userSK = "5cfc3fc9-fb2c-4809-9586-44ffce7c24ca"; // Temporário
+            UserInformation userInformation = userInformationService.getUserInformationByUserSK(userSK);
+            return ResponseEntity.ok(userInformation);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
