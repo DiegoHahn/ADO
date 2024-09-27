@@ -1,5 +1,6 @@
 package com.thomsonreuters.ado.Service;
 
+import com.thomsonreuters.ado.Client.AzureDevOpsClient;
 import com.thomsonreuters.ado.Model.ActivityRecord;
 import com.thomsonreuters.ado.Model.ActivityRecordDTO;
 import com.thomsonreuters.ado.Repository.ActivityRecordRepository;
@@ -12,13 +13,15 @@ import java.time.LocalTime;
 public class ActivityRecordService {
 
     private final ActivityRecordRepository activityRecordRepository;
+    private final AzureDevOpsClient azureDevOpsClient;
 
     @Autowired
-    public ActivityRecordService(ActivityRecordRepository activityRecordRepository) {
+    public ActivityRecordService(ActivityRecordRepository activityRecordRepository, AzureDevOpsClient azureDevOpsClient) {
         this.activityRecordRepository = activityRecordRepository;
+        this.azureDevOpsClient = azureDevOpsClient;
     }
 
-    public ActivityRecord saveActivityRecord(ActivityRecordDTO dto) {
+    public ActivityRecord saveActivityRecord(ActivityRecordDTO dto) throws Exception {
         ActivityRecord record = new ActivityRecord(
                 dto.getId(),
                 dto.getBoard(),
@@ -33,6 +36,29 @@ public class ActivityRecordService {
                 LocalTime.parse(dto.getStartTime()),
                 dto.getCompletedWork()
         );
-        return activityRecordRepository.save(record);
+
+        ActivityRecord savedRecord = activityRecordRepository.save(record);
+
+        String updateQuery = AzureDevOpsClient.UpdateWorkItemQuery(
+                record.getRemainingWork(),
+                parseCompletedWork(record.getCompletedWork())
+        );
+
+        try {
+            azureDevOpsClient.updateWorkItem(dto.getTask().getWorkItemId(), updateQuery);
+        } catch (Exception e) {
+            throw new Exception("Falha ao atualizar o WorkItem na Azure DevOps", e);
+        }
+
+        return savedRecord;
+    }
+
+    private double parseCompletedWork(String completedWork) {
+        String[] timeParts = completedWork.split(":");
+        int hours = Integer.parseInt(timeParts[0]);
+        int minutes = Integer.parseInt(timeParts[1]);
+        int seconds = Integer.parseInt(timeParts[2]);
+
+        return hours + (minutes / 60.0) + (seconds / 3600.0);
     }
 }

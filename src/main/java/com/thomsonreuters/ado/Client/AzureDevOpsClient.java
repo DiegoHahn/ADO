@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Locale;
 
 public class AzureDevOpsClient {
     private final String organizationUrl;
@@ -95,4 +96,22 @@ public class AzureDevOpsClient {
             throw new Exception("Failed to execute WIQL query: " + response.body());
         }
     }
+
+    public static String UpdateWorkItemQuery(Double remainingWork, Double completedWork) {
+        return String.format(Locale.US, """
+            [
+                {
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.RemainingWork",
+                    "value": %.2f
+                },
+                {
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.CompletedWork",
+                    "value": %.2f
+                }
+            ]
+            """, remainingWork, completedWork);
+    }
 }
+

@@ -24,7 +24,7 @@ public class ActivityRecordController {
     }
 
     @PostMapping
-    public ResponseEntity<ActivityRecord> createActivityRecord(@RequestBody ActivityRecordDTO activityRecordDTO) {
+    public ResponseEntity<ActivityRecord> createActivityRecord(@RequestBody ActivityRecordDTO activityRecordDTO) throws Exception {
         ActivityRecord savedRecord = activityRecordService.saveActivityRecord(activityRecordDTO);
         return new ResponseEntity<>(savedRecord, HttpStatus.CREATED);
     }
