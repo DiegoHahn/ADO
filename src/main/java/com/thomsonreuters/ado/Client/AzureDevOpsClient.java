@@ -1,17 +1,13 @@
 package com.thomsonreuters.ado.Client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
-import com.thomsonreuters.ado.Model.TargetWorkItem;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AzureDevOpsClient {
     private final String organizationUrl;
@@ -28,12 +24,12 @@ public class AzureDevOpsClient {
         this.projectName = projectName;
     }
 
-    public String getWorItems(String userStoryID, String userSK) throws Exception {
+    public String getWorItems(String userStoryID, String azureUserID) throws Exception {
         String queryURL = analyticsOrganizationUrl + projectName
                 + "_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType"
                 + "&$filter=WorkItemId%20eq%20" + userStoryID
                 + "&$expand=Links($select=TargetWorkItemId;"
-                + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + userSK
+                + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + azureUserID
                 + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,RemainingWork,State,AssignedToUserSK))";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(queryURL))
@@ -50,7 +46,7 @@ public class AzureDevOpsClient {
         return response.body();
     }
 
-    public String getUserSKByEmail(String userEmail) throws Exception {
+    public String getAzureUserIDByEmail(String userEmail) throws Exception {
         String analyticsUrl = analyticsOrganizationUrl
                 + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
                 + userEmail

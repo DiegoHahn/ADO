@@ -36,9 +36,8 @@ public class ActivityRecord {
 
     public ActivityRecord() {}
 
-    public ActivityRecord(String board, String userStoryId, boolean concluded, int workItemId,
-                          String assignedToUserSK, String title, String state, Double originalEstimate,
-                          Double remainingWork, LocalTime startTime, String completedWork) {
+    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime startTime, String completedWork) {
+        this.id = id;
         this.board = board;
         this.userStoryId = userStoryId;
         this.concluded = concluded;

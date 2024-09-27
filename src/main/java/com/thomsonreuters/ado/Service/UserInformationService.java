@@ -12,8 +12,8 @@ public class UserInformationService {
         this.userInformationRepository = userInformationRepository;
     }
 
-    public UserInformation getUserInformationByUserSK(String userSK) {
-        return userInformationRepository.findByUserSK(userSK);
+    public UserInformation getUserInformationByUserEmail(String email) {
+        return userInformationRepository.findByEmail(email);
     }
 
     public UserInformation saveUserInformation(UserInformation userInformation) {

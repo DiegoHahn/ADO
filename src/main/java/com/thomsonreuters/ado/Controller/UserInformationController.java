@@ -31,23 +31,25 @@ public class UserInformationController {
         }
     }
 
-    @GetMapping("/userSK/{email}")
-    public ResponseEntity<Map<String, String>> getUserSKByEmail(@PathVariable String email) throws Exception {
-        String userSK = azureDevOpsClient.getUserSKByEmail(email);
+    @GetMapping("/azureUserID/{email}")
+    public ResponseEntity<Map<String, String>> getAzureUserID(@PathVariable String email) throws Exception {
+        String azureUserID = azureDevOpsClient.getAzureUserIDByEmail(email);
         Map<String, String> response = new HashMap<>();
-        response.put("userSK", userSK);
+        response.put("azureUserID", azureUserID);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<UserInformation> getCurrentUserInformation() {
-        // como obter o usuário atual? um token de autenticação, uma sessão? LocalStorage?
+    @GetMapping("/{email}")
+    public ResponseEntity<UserInformation> getCurrentUserInformation(@PathVariable String email) {
         try {
-            String userSK = "5cfc3fc9-fb2c-4809-9586-44ffce7c24ca"; // Temporário
-            UserInformation userInformation = userInformationService.getUserInformationByUserSK(userSK);
-            return ResponseEntity.ok(userInformation);
+            UserInformation userInformation = userInformationService.getUserInformationByUserEmail(email);
+            if (userInformation != null) {
+                return ResponseEntity.ok(userInformation);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

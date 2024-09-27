@@ -20,6 +20,7 @@ public class ActivityRecordService {
 
     public ActivityRecord saveActivityRecord(ActivityRecordDTO dto) {
         ActivityRecord record = new ActivityRecord(
+                dto.getId(),
                 dto.getBoard(),
                 dto.getUserStoryId(),
                 dto.isConcluded(),
