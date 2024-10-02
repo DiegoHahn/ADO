@@ -20,9 +20,8 @@ public class WorkItemController {
     }
 
     @GetMapping("/userstory/{id}")
-    public ResponseEntity<List<TargetWorkItem>> getTargetWorkItemsForUserStory(@PathVariable String id) throws Exception {
-        String azureDevOpsResponse = azureDevOpsClient.getWorItems(id, "5cfc3fc9-fb2c-4809-9586-44ffce7c24ca");
-
+    public ResponseEntity<List<TargetWorkItem>> getTargetWorkItemsForUserStory(@PathVariable String id,  @RequestParam String email) throws Exception {
+        String azureDevOpsResponse = azureDevOpsClient.getWorItems(id, email);
         try {
             List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
             return ResponseEntity.ok(targetWorkItems);

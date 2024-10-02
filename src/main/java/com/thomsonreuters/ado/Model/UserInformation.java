@@ -19,14 +19,18 @@ public class UserInformation {
     @Column (nullable = false)
     private String board;
 
+    @Column (nullable = true)
+    private String personalAccessToken;
+
     public UserInformation() {
     }
 
-    public UserInformation(Long id, String email, String azureUserID, String board) {
+    public UserInformation(Long id, String email, String azureUserID, String board, String personalAccessToken) {
         this.id = id;
         this.email = email;
         this.azureUserID = azureUserID;
         this.board = board;
+        this.personalAccessToken = personalAccessToken;
     }
 
     public Long getId() {
@@ -59,5 +63,13 @@ public class UserInformation {
 
     public void setBoard(String board) {
         this.board = board;
+    }
+
+    public String getPersonalAccessToken() {
+        return personalAccessToken;
+    }
+
+    public void setPersonalAccessToken(String personalAccessToken) {
+        this.personalAccessToken = personalAccessToken;
     }
 }

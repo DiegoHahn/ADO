@@ -25,16 +25,16 @@ public class AzureDevOpsClient {
         this.projectName = projectName;
     }
 
-    public String getWorItems(String userStoryID, String azureUserID) throws Exception {
+    public String getWorItems(String userStoryID, String email) throws Exception {
         String queryURL = analyticsOrganizationUrl + projectName
                 + "_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType"
                 + "&$filter=WorkItemId%20eq%20" + userStoryID
                 + "&$expand=Links($select=TargetWorkItemId;"
-                + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + azureUserID
+                + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + authenticator.getLocalAzureUserID(email)
                 + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,RemainingWork,State,AssignedToUserSK))";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(queryURL))
-                .header("Authorization", authenticator.getAuthHeader())
+                .header("Authorization", authenticator.getAuthHeader(email))
                 .header("Content-Type", "application/json")
                 .GET().build();
 
@@ -47,6 +47,7 @@ public class AzureDevOpsClient {
         return response.body();
     }
 
+    //TODO: Não vai funcionar para a primeira execução, pois o usuário ainda não está cadastrado no banco (mudar o front para cadastrar o usuário antes de fazer a requisição)
     public String getAzureUserIDByEmail(String userEmail) throws Exception {
         String analyticsUrl = analyticsOrganizationUrl
                 + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
@@ -55,7 +56,7 @@ public class AzureDevOpsClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(analyticsUrl))
-                .header("Authorization", authenticator.getAuthHeader())
+                .header("Authorization", authenticator.getAuthHeader(userEmail))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -63,7 +64,7 @@ public class AzureDevOpsClient {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {
-            throw new Exception("Failed to retrieve UserSK: " + response.body());
+            throw new Exception("Failed to retrieve AzureUserID: " + response.body());
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -75,7 +76,7 @@ public class AzureDevOpsClient {
                 return userSK;
             }
         }
-        throw new Exception("UserSK not found in the response");
+        throw new Exception("AzureUserID not found in the response");
     }
 
 
@@ -86,7 +87,7 @@ public class AzureDevOpsClient {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(wiqlUrl))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(Query))
-                .header("Authorization", authenticator.getAuthHeader())
+//                .header("Authorization", authenticator.getAuthHeader()) PRECISO FAZER O AJUSTE NO BANCO PARA CHAVE SECUNDARIA DO USER COM WI
                 .header("Content-Type", "application/json-patch+json")
                 .build();
 
@@ -97,6 +98,7 @@ public class AzureDevOpsClient {
         }
     }
 
+    //TODO: implementar o calculo do remaining work
     public static String UpdateWorkItemQuery(Double remainingWork, Double completedWork) {
         return String.format(Locale.US, """
             [
