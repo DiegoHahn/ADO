@@ -20,17 +20,6 @@ public class WorkItemController {
         this.azureDevOpsClient = azureDevOpsClient;
     }
 
-//    @GetMapping("/userstory/{id}")
-//    public ResponseEntity<List<TargetWorkItem>> getTargetWorkItemsForUserStory(@PathVariable String id,  @RequestParam String email) throws Exception {
-//        String azureDevOpsResponse = azureDevOpsClient.getWorItems(id, email);
-//        try {
-//            List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
-//            return ResponseEntity.ok(targetWorkItems);
-//        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     @PostMapping("/userstory")
     public ResponseEntity<List<TargetWorkItem>> getTargetWorkItemsForUserStory(@RequestBody UserStoryRequest request) throws Exception {
         String azureDevOpsResponse = azureDevOpsClient.getWorItems(request.getUserStoryId(), request.getUserEmail());
