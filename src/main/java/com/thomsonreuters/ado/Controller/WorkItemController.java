@@ -2,6 +2,7 @@ package com.thomsonreuters.ado.Controller;
 
 import com.thomsonreuters.ado.Client.AzureDevOpsClient;
 import com.thomsonreuters.ado.Model.TargetWorkItem;
+import com.thomsonreuters.ado.Model.UserStoryRequest;
 import com.thomsonreuters.ado.Service.WorkItemService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +20,20 @@ public class WorkItemController {
         this.azureDevOpsClient = azureDevOpsClient;
     }
 
-    @GetMapping("/userstory/{id}")
-    public ResponseEntity<List<TargetWorkItem>> getTargetWorkItemsForUserStory(@PathVariable String id,  @RequestParam String email) throws Exception {
-        String azureDevOpsResponse = azureDevOpsClient.getWorItems(id, email);
+//    @GetMapping("/userstory/{id}")
+//    public ResponseEntity<List<TargetWorkItem>> getTargetWorkItemsForUserStory(@PathVariable String id,  @RequestParam String email) throws Exception {
+//        String azureDevOpsResponse = azureDevOpsClient.getWorItems(id, email);
+//        try {
+//            List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
+//            return ResponseEntity.ok(targetWorkItems);
+//        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
+    @PostMapping("/userstory")
+    public ResponseEntity<List<TargetWorkItem>> getTargetWorkItemsForUserStory(@RequestBody UserStoryRequest request) throws Exception {
+        String azureDevOpsResponse = azureDevOpsClient.getWorItems(request.getUserStoryId(), request.getUserEmail());
         try {
             List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
             return ResponseEntity.ok(targetWorkItems);
