@@ -34,9 +34,12 @@ public class ActivityRecord {
     @Column(name = "completed_work")
     private String completedWork;
 
+    @Column
+    private int status;
+
     public ActivityRecord() {}
 
-    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime startTime, String completedWork) {
+    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime startTime, String completedWork, int status) {
         this.id = id;
         this.board = board;
         this.userStoryId = userStoryId;
@@ -49,6 +52,10 @@ public class ActivityRecord {
         this.remainingWork = remainingWork;
         this.startTime = startTime;
         this.completedWork = completedWork;
+        this.status = status;
+    }
+
+    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime parse, String completedWork) {
     }
 
     public Long getId() {
@@ -145,5 +152,13 @@ public class ActivityRecord {
 
     public void setCompletedWork(String completedWork) {
         this.completedWork = completedWork;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

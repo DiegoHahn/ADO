@@ -7,4 +7,6 @@ public interface UserInformationRepository extends JpaRepository<UserInformation
     UserInformation findByEmail(String email);
 
     UserInformation findByAzureUserID(String userSK);
+
+    UserInformation findByUserId(Long userId);
 }

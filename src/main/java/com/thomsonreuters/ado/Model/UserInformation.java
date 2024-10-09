@@ -8,7 +8,8 @@ public class UserInformation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -25,20 +26,20 @@ public class UserInformation {
     public UserInformation() {
     }
 
-    public UserInformation(Long id, String email, String azureUserID, String board, String personalAccessToken) {
-        this.id = id;
+    public UserInformation(Long userId, String email, String azureUserID, String board, String personalAccessToken) {
+        this.userId = userId;
         this.email = email;
         this.azureUserID = azureUserID;
         this.board = board;
         this.personalAccessToken = personalAccessToken;
     }
 
-    public Long getId() {
-        return id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {

@@ -2,11 +2,11 @@ package com.thomsonreuters.ado.Model;
 
 public class UserStoryRequest {
     private String userStoryId;
-    private String userEmail;
+    private Long userId;
 
-    public UserStoryRequest(String userStoryId, String userEmail) {
+    public UserStoryRequest(String userStoryId, Long userId) {
         this.userStoryId = userStoryId;
-        this.userEmail = userEmail;
+        this.userId = userId;
     }
 
     public String getUserStoryId() {
@@ -17,11 +17,11 @@ public class UserStoryRequest {
         this.userStoryId = userStoryId;
     }
 
-    public String getUserEmail() {
-        return userEmail;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

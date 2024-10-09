@@ -11,49 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-//@RestController
-//@RequestMapping("/userInformation")
-//public class UserInformationController {
-//    private final AzureDevOpsClient azureDevOpsClient;
-//    private final UserInformationService userInformationService;
-//
-//    public UserInformationController(AzureDevOpsClient azureDevOpsClient, UserInformationService userInformationService) {
-//        this.azureDevOpsClient = azureDevOpsClient;
-//        this.userInformationService = userInformationService;
-//    }
-//
-//    @PostMapping
-//    public ResponseEntity<UserInformation> saveUserInformation(@RequestBody UserInformation userInformation) {
-//        try {
-//            UserInformation savedUserInformation = userInformationService.saveUserInformation(userInformation);
-//            return new ResponseEntity<>(savedUserInformation, HttpStatus.CREATED);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-//
-//    @GetMapping("/azureUserID/{email}")
-//    public ResponseEntity<Map<String, String>> getAzureUserID(@PathVariable String email) throws Exception {
-//        String azureUserID = azureDevOpsClient.getAzureUserIDByEmail(email);
-//        Map<String, String> response = new HashMap<>();
-//        response.put("azureUserID", azureUserID);
-//        return ResponseEntity.ok(response);
-//    }
-//
-//    @GetMapping("/{email}")
-//    public ResponseEntity<UserInformation> getCurrentUserInformation(@PathVariable String email) {
-//        try {
-//            UserInformation userInformation = userInformationService.getUserInformationByUserEmail(email);
-//            if (userInformation != null) {
-//                return ResponseEntity.ok(userInformation);
-//            } else {
-//                return ResponseEntity.notFound().build();
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-//}
 @RestController
 @RequestMapping("/userInformation")
 public class UserInformationController {

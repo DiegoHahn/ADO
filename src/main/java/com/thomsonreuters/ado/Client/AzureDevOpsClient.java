@@ -25,16 +25,16 @@ public class AzureDevOpsClient {
         this.projectName = projectName;
     }
 
-    public String getWorItems(String userStoryID, String email) throws Exception {
+    public String getWorItems(String userStoryId, Long userId) throws Exception {
         String queryURL = analyticsOrganizationUrl + projectName
                 + "_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType"
-                + "&$filter=WorkItemId%20eq%20" + userStoryID
+                + "&$filter=WorkItemId%20eq%20" + userStoryId
                 + "&$expand=Links($select=TargetWorkItemId;"
-                + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + authenticator.getLocalAzureUserID(email)
+                + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + authenticator.getLocalAzureUserID(userId)
                 + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,RemainingWork,State,AssignedToUserSK))";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(queryURL))
-                .header("Authorization", authenticator.getAuthHeader(email))
+                .header("Authorization", authenticator.getAuthHeaderById(userId))
                 .header("Content-Type", "application/json")
                 .GET().build();
 
@@ -56,7 +56,7 @@ public class AzureDevOpsClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(analyticsUrl))
-                .header("Authorization", authenticator.getAuthHeader(userEmail))
+                .header("Authorization", authenticator.getAuthHeaderByEmail(userEmail))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -87,7 +87,7 @@ public class AzureDevOpsClient {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(wiqlUrl))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(Query))
-//                .header("Authorization", authenticator.getAuthHeader()) PRECISO FAZER O AJUSTE NO BANCO PARA CHAVE SECUNDARIA DO USER COM WI
+                .header("Authorization", authenticator.getAuthHeaderById(1L))  //TODO: mudar para pegar do usuário logado
                 .header("Content-Type", "application/json-patch+json")
                 .build();
 
