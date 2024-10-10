@@ -1,7 +1,6 @@
 package com.thomsonreuters.ado.Model;
 
 public class ActivityRecordDTO {
-    private Long id;
     private String board;
     private String userStoryId;
     private boolean concluded;
@@ -11,8 +10,7 @@ public class ActivityRecordDTO {
     private String startTime;
     private String completedWork;
 
-    public ActivityRecordDTO(Long id, String board, String userStoryId, boolean concluded, TargetWorkItem task, Double originalEstimate, Double remainingWork, String startTime, String completedWork) {
-        this.id = id;
+    public ActivityRecordDTO(String board, String userStoryId, boolean concluded, TargetWorkItem task, Double originalEstimate, Double remainingWork, String startTime, String completedWork) {
         this.board = board;
         this.userStoryId = userStoryId;
         this.concluded = concluded;
@@ -22,15 +20,7 @@ public class ActivityRecordDTO {
         this.startTime = startTime;
         this.completedWork = completedWork;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    
     public String getBoard() {
         return board;
     }
