@@ -7,7 +7,9 @@ import com.thomsonreuters.ado.Model.TargetWorkItem;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class WorkItemService {
@@ -40,6 +42,8 @@ public class WorkItemService {
 			}
 		}
 
-		return targetWorkItems;
+		return targetWorkItems.stream()
+				.sorted(Comparator.comparingInt(TargetWorkItem::getWorkItemId))
+				.collect(Collectors.toList());
 	}
 }

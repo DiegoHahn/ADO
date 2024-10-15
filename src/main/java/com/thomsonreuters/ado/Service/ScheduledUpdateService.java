@@ -20,18 +20,22 @@ public class ScheduledUpdateService {
         this.azureDevOpsClient = azureDevOpsClient;
     }
 
-    @Scheduled(fixedRate = 16000)
+    @Scheduled(fixedRate = 50000)
     public void updatePendingWorkItems() {
-        List<ActivityRecord> pendingRecords = activityRecordRepository.findByStatus(1);
+
+        List<ActivityRecord> pendingRecords = activityRecordRepository.findTop20ByStatus(1);
 
         for (ActivityRecord record : pendingRecords) {
             try {
+                Double updatedRemaingWork = record.getRemainingWork() - parseCompletedWork(record.getCompletedWork());
                 String updateQuery = AzureDevOpsClient.UpdateWorkItemQuery(
-                        record.getRemainingWork(),
+                        updatedRemaingWork,
                         parseCompletedWork(record.getCompletedWork())
-                );
 
-                azureDevOpsClient.updateWorkItem(record.getWorkItemId(), updateQuery);
+                );
+                System.out.println(record.getRemainingWork() + " - " + parseCompletedWork(record.getCompletedWork()) + " = " + updatedRemaingWork);
+
+                azureDevOpsClient.updateWorkItem(record.getWorkItemId(), updateQuery, record.getUserId().getUserId());
 
                 // Se não ocorreu erro atualiza o status para 0
                 record.setStatus(0);

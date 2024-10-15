@@ -37,9 +37,13 @@ public class ActivityRecord {
     @Column
     private int status;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private UserInformation userId;
+
     public ActivityRecord() {}
 
-    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime startTime, String completedWork, int status) {
+    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime startTime, String completedWork, int status, UserInformation userId) {
         this.id = id;
         this.board = board;
         this.userStoryId = userStoryId;
@@ -53,6 +57,7 @@ public class ActivityRecord {
         this.startTime = startTime;
         this.completedWork = completedWork;
         this.status = status;
+        this.userId = userId;
     }
 
     public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime parse, String completedWork) {
@@ -160,5 +165,13 @@ public class ActivityRecord {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public UserInformation getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UserInformation user) {
+        this.userId = user;
     }
 }

@@ -2,6 +2,8 @@ package com.thomsonreuters.ado.Model;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "user_information")
 public class UserInformation {
@@ -22,6 +24,9 @@ public class UserInformation {
 
     @Column (nullable = true)
     private String personalAccessToken;
+
+    @OneToMany(mappedBy = "userId")
+    private List<ActivityRecord> activityRecords;
 
     public UserInformation() {
     }

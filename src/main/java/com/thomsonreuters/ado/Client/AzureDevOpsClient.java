@@ -3,6 +3,7 @@ package com.thomsonreuters.ado.Client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
+import com.thomsonreuters.ado.Repository.ActivityRecordRepository;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -80,14 +81,14 @@ public class AzureDevOpsClient {
     }
 
 
-    public void updateWorkItem(int  workItemId, String Query) throws Exception {
+    public void updateWorkItem(int  workItemId, String Query, Long userId) throws Exception {
         String wiqlUrl = organizationUrl + projectName
                 + "_apis/wit/workitems/" + workItemId
                 + "?api-version=7.0";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(wiqlUrl))
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(Query))
-                .header("Authorization", authenticator.getAuthHeaderById(1L))  //TODO: mudar para pegar do usuário logado
+                .header("Authorization", authenticator.getAuthHeaderById(userId))
                 .header("Content-Type", "application/json-patch+json")
                 .build();
 
