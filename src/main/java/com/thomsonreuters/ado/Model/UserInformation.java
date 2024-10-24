@@ -19,7 +19,7 @@ public class UserInformation {
     @Column(nullable = false, unique = true)
     private String azureUserID;
 
-    @Column (nullable = false)
+    @Column
     private String board;
 
     @Column (nullable = true)

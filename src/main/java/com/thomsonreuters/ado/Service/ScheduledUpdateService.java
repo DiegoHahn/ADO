@@ -33,18 +33,14 @@ public class ScheduledUpdateService {
                         parseCompletedWork(record.getCompletedWork())
 
                 );
-                System.out.println(record.getRemainingWork() + " - " + parseCompletedWork(record.getCompletedWork()) + " = " + updatedRemaingWork);
-
                 azureDevOpsClient.updateWorkItem(record.getWorkItemId(), updateQuery, record.getUserId().getUserId());
 
-                // Se não ocorreu erro atualiza o status para 0
                 record.setStatus(0);
 
             } catch (Exception e) {
                 record.setStatus(2); // status de erro
                 System.err.println("Falha ao atualizar o WorkItem no ADO: " + e.getMessage());
             } finally {
-                // Salva no banco independentemente do resultado
                 activityRecordRepository.save(record);
             }
         }
