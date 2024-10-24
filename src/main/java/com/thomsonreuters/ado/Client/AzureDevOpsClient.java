@@ -3,12 +3,12 @@ package com.thomsonreuters.ado.Client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
-import com.thomsonreuters.ado.Repository.ActivityRecordRepository;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Base64;
 import java.util.Locale;
 
 public class AzureDevOpsClient {
@@ -48,8 +48,7 @@ public class AzureDevOpsClient {
         return response.body();
     }
 
-    //TODO: Não vai funcionar para a primeira execução, pois o usuário ainda não está cadastrado no banco (mudar o front para cadastrar o usuário antes de fazer a requisição)
-    public String getAzureUserIDByEmail(String userEmail) throws Exception {
+    public String getAzureUserIDByEmail(String userEmail, String token) throws Exception {
         String analyticsUrl = analyticsOrganizationUrl
                 + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
                 + userEmail
@@ -57,7 +56,7 @@ public class AzureDevOpsClient {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(analyticsUrl))
-                .header("Authorization", authenticator.getAuthHeaderByEmail(userEmail))
+                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((":" + token).getBytes()))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -99,7 +98,6 @@ public class AzureDevOpsClient {
         }
     }
 
-    //TODO: implementar o calculo do remaining work
     public static String UpdateWorkItemQuery(Double remainingWork, Double completedWork) {
         return String.format(Locale.US, """
             [

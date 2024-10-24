@@ -1,9 +1,11 @@
 package com.thomsonreuters.ado.Controller;
 
 import com.thomsonreuters.ado.Client.AzureDevOpsClient;
-import com.thomsonreuters.ado.Model.EmailRequest;
+import com.thomsonreuters.ado.Model.AzureUserIDRequest;
 import com.thomsonreuters.ado.Model.UserInformation;
 import com.thomsonreuters.ado.Service.UserInformationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ public class UserInformationController {
     private final AzureDevOpsClient azureDevOpsClient;
     private final UserInformationService userInformationService;
 
+    @Autowired
     public UserInformationController(AzureDevOpsClient azureDevOpsClient, UserInformationService userInformationService) {
         this.azureDevOpsClient = azureDevOpsClient;
         this.userInformationService = userInformationService;
@@ -33,15 +36,34 @@ public class UserInformationController {
     }
 
     @PostMapping("/azureUserID")
-    public ResponseEntity<Map<String, String>> getAzureUserID(@RequestBody EmailRequest request) throws Exception {
-        String azureUserID = azureDevOpsClient.getAzureUserIDByEmail(request.getEmail());
-        Map<String, String> response = new HashMap<>();
-        response.put("azureUserID", azureUserID);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<String> validateAndSaveAzureUserID(@RequestBody AzureUserIDRequest request) {
+        try {
+            String azureUserID = azureDevOpsClient.getAzureUserIDByEmail(request.getEmail(), request.getToken());
+            UserInformation existingUser = userInformationService.getUserInformationByUserEmail(request.getEmail());
+
+            if (existingUser == null) {
+                UserInformation newUser = new UserInformation();
+                newUser.setEmail(request.getEmail());
+                newUser.setAzureUserID(azureUserID);
+                newUser.setPersonalAccessToken(request.getToken());
+
+                userInformationService.saveUserInformation(newUser);
+            } else {
+                existingUser.setAzureUserID(azureUserID);
+                existingUser.setPersonalAccessToken(request.getToken());
+
+                userInformationService.saveUserInformation(existingUser);
+            }
+
+            return ResponseEntity.ok("AzureUserID salvo com sucesso!");
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/details")
-    public ResponseEntity<UserInformation> getCurrentUserInformation(@RequestBody EmailRequest request) {
+    public ResponseEntity<UserInformation> getCurrentUserInformation(@RequestBody AzureUserIDRequest request) {
         try {
             UserInformation userInformation = userInformationService.getUserInformationByUserEmail(request.getEmail());
             if (userInformation != null) {
@@ -49,9 +71,8 @@ public class UserInformationController {
             } else {
                 return ResponseEntity.notFound().build();
             }
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
-
