@@ -3,6 +3,8 @@ package com.thomsonreuters.ado.Client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
+import com.thomsonreuters.ado.Exceptions.InvalidTokenException;
+import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -48,37 +50,39 @@ public class AzureDevOpsClient {
         return response.body();
     }
 
-    public String getAzureUserIDByEmail(String userEmail, String token) throws Exception {
+    public String getAzureUserIDByEmail(String userEmail, String token) throws InvalidTokenException, UserNotFoundException, Exception {
         String analyticsUrl = analyticsOrganizationUrl
                 + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
                 + userEmail
                 + "'&$select=UserSK";
-
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(analyticsUrl))
                 .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((":" + token).getBytes()))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
-
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() != 200) {
-            throw new Exception("Failed to retrieve AzureUserID: " + response.body());
+        if (response.statusCode() == 401) {
+            throw new InvalidTokenException("Token inválido ou expirado.");
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootNode = objectMapper.readTree(response.body());
-        JsonNode valueNode = rootNode.path("value");
-        if (valueNode.isArray() && !valueNode.isEmpty()) {
-            String userSK = valueNode.get(0).path("UserSK").asText();
-            if (!userSK.isEmpty()) {
-                return userSK;
+        //todo: refatorar ifs encadeados
+        if (response.statusCode() == 200) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(response.body());
+            JsonNode valueNode = rootNode.path("value");
+
+            if (valueNode.isArray() && !valueNode.isEmpty()) {
+                String userSK = valueNode.get(0).path("UserSK").asText();
+                if (!userSK.isEmpty()) {
+                    return userSK;
+                }
             }
+            throw new UserNotFoundException("Usuário não encontrado para o email fornecido.");
         }
-        throw new Exception("AzureUserID not found in the response");
+        throw new Exception("Falha ao recuperar o AzureUserID: " + response.body());
     }
-
 
     public void updateWorkItem(int  workItemId, String Query, Long userId) throws Exception {
         String wiqlUrl = organizationUrl + projectName

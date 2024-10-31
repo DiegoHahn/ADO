@@ -23,7 +23,7 @@ public class UserInformation {
     private String board;
 
     @Column (nullable = true)
-    private String personalAccessToken;
+    private String token;
 
     @OneToMany(mappedBy = "userId")
     private List<ActivityRecord> activityRecords;
@@ -31,12 +31,12 @@ public class UserInformation {
     public UserInformation() {
     }
 
-    public UserInformation(Long userId, String email, String azureUserID, String board, String personalAccessToken) {
+    public UserInformation(Long userId, String email, String azureUserID, String board, String token) {
         this.userId = userId;
         this.email = email;
         this.azureUserID = azureUserID;
         this.board = board;
-        this.personalAccessToken = personalAccessToken;
+        this.token = token;
     }
 
     public Long getUserId() {
@@ -71,11 +71,11 @@ public class UserInformation {
         this.board = board;
     }
 
-    public String getPersonalAccessToken() {
-        return personalAccessToken;
+    public String getToken() {
+        return token;
     }
 
-    public void setPersonalAccessToken(String personalAccessToken) {
-        this.personalAccessToken = personalAccessToken;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

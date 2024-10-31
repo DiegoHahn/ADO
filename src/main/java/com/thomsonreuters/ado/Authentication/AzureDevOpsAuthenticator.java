@@ -18,7 +18,7 @@ public class AzureDevOpsAuthenticator {
     public String getAuthHeaderById(Long userId) throws Exception {
         try {
             UserInformation userInformation = userInformationRepository.findByUserId(userId);
-            String personalAccessToken = userInformation.getPersonalAccessToken();
+            String personalAccessToken = userInformation.getToken();
             if (personalAccessToken == null || personalAccessToken.isEmpty()) {
                 throw new Exception("Personal Access Token not found for user: " + userId);
             }
@@ -31,7 +31,7 @@ public class AzureDevOpsAuthenticator {
     public String getAuthHeaderByEmail(String email) throws Exception {
         try {
             UserInformation userInformation = userInformationRepository.findByEmail(email);
-            String personalAccessToken = userInformation.getPersonalAccessToken();
+            String personalAccessToken = userInformation.getToken();
             if (personalAccessToken == null || personalAccessToken.isEmpty()) {
                 throw new Exception("Personal Access Token not found for user: " + email);
             }
