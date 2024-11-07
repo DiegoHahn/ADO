@@ -1,5 +1,6 @@
 package com.thomsonreuters.ado.Service;
 
+import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
 import com.thomsonreuters.ado.Model.ActivityRecord;
 import com.thomsonreuters.ado.Model.ActivityRecordDTO;
 import com.thomsonreuters.ado.Model.UserInformation;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 public class ActivityRecordService {
@@ -22,7 +24,7 @@ public class ActivityRecordService {
         this.userInformationRepository = userInformationRepository;
     }
 
-    public ActivityRecord saveActivityRecord(ActivityRecordDTO dto) {
+    public ActivityRecord saveActivityRecord(ActivityRecordDTO dto) throws UserNotFoundException {
         ActivityRecord record = new ActivityRecord();
 
         record.setBoard(dto.getBoard());
@@ -47,9 +49,17 @@ public class ActivityRecordService {
         record.setStatus(1);
 
         UserInformation user = userInformationRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com ID: " + dto.getUserId())); //todo criar uma exceção personalizada para usuario nao encontrado
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com ID: " + dto.getUserId())); //todo criar uma exceção personalizada para usuario nao encontrado
 
         record.setUserId(user);
         return activityRecordRepository.save(record);
+    }
+
+    public void updateActivityRecordsStatus(Long userId, int oldStatus, int newStatus) {
+        List<ActivityRecord> records = activityRecordRepository.findByStatusAndUserId(oldStatus, userId);
+        for (ActivityRecord record : records) {
+            record.setStatus(newStatus);
+            activityRecordRepository.save(record);
+        }
     }
 }

@@ -4,6 +4,8 @@ import com.thomsonreuters.ado.Model.UserInformation;
 import com.thomsonreuters.ado.Repository.UserInformationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserInformationService {
     private final UserInformationRepository userInformationRepository;
@@ -14,6 +16,10 @@ public class UserInformationService {
 
     public UserInformation getUserInformationByUserEmail(String email) {
         return userInformationRepository.findByEmail(email);
+    }
+
+    public Optional<UserInformation> getUserInformationByUserId(Long userId) {
+        return userInformationRepository.findById(userId);
     }
 
     public UserInformation saveUserInformation(UserInformation userInformation) {

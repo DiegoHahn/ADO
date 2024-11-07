@@ -7,6 +7,7 @@ import com.thomsonreuters.ado.Model.AzureUserIDRequest;
 import com.thomsonreuters.ado.Model.UserInformation;
 import com.thomsonreuters.ado.Model.UserInformationRequest;
 import com.thomsonreuters.ado.Model.UserInformationResponse;
+import com.thomsonreuters.ado.Service.ActivityRecordService;
 import com.thomsonreuters.ado.Service.UserInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -22,11 +23,13 @@ import java.util.Map;
 public class UserInformationController {
     private final AzureDevOpsClient azureDevOpsClient;
     private final UserInformationService userInformationService;
+    private final ActivityRecordService activityRecordService;
 
     @Autowired
-    public UserInformationController(AzureDevOpsClient azureDevOpsClient, UserInformationService userInformationService) {
+    public UserInformationController(AzureDevOpsClient azureDevOpsClient, UserInformationService userInformationService, ActivityRecordService activityRecordService) {
         this.azureDevOpsClient = azureDevOpsClient;
         this.userInformationService = userInformationService;
+        this.activityRecordService = activityRecordService;
     }
 
     @PostMapping("/details")
@@ -87,6 +90,9 @@ public class UserInformationController {
         }
 
         userInformationService.saveUserInformation(existingUser);
+
+        activityRecordService.updateActivityRecordsStatus(existingUser.getUserId(), 2, 1);
+
         return ResponseEntity.ok("Dados do usuário atualizados com sucesso!");
     }
 
@@ -106,5 +112,4 @@ public class UserInformationController {
     private boolean isTokenProvided(UserInformationRequest request) {
         return request.getToken() != null && !request.getToken().isEmpty();
     }
-
 }
