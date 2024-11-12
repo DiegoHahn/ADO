@@ -7,14 +7,16 @@ public class TargetWorkItem {
     private String state;
     private Double originalEstimate;
     private Double remainingWork;
+    private Double completedWork;
 
-    public TargetWorkItem(int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork) {
+    public TargetWorkItem(int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, Double completedWork) {
         this.workItemId = workItemId;
         this.assignedToUserSK = assignedToUserSK;
         this.title = title;
         this.state = state;
         this.originalEstimate = originalEstimate;
         this.remainingWork = remainingWork;
+        this.completedWork = completedWork;
     }
 
     public int getWorkItemId() {
@@ -63,5 +65,26 @@ public class TargetWorkItem {
 
     public void setRemainingWork(Double remainingWork) {
         this.remainingWork = remainingWork;
+    }
+
+    public Double getCompletedWork() {
+        return completedWork;
+    }
+
+    public void setCompletedWork(Double completedWork) {
+        this.completedWork = completedWork;
+    }
+
+    @Override
+    public String toString() {
+        return "TargetWorkItem{" +
+                "workItemId=" + workItemId +
+                ", assignedToUserSK='" + assignedToUserSK + '\'' +
+                ", title='" + title + '\'' +
+                ", state='" + state + '\'' +
+                ", originalEstimate=" + originalEstimate +
+                ", remainingWork=" + remainingWork +
+                ", completedWork=" + completedWork +
+                '}';
     }
 }

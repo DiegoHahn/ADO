@@ -41,8 +41,6 @@ public class AzureDevOpsAuthenticator {
         }
     }
 
-
-
     public String getLocalAzureUserID(Long userId) throws Exception {
         try {
             UserInformation userInformation = userInformationRepository.findByUserId(userId);

@@ -18,14 +18,12 @@ public class AzureDevOpsClient {
     private final AzureDevOpsAuthenticator authenticator;
     private final HttpClient client;
     private final String analyticsOrganizationUrl;
-    private final String projectName;
 
-    public AzureDevOpsClient(String organizationUrl, AzureDevOpsAuthenticator authenticator, String analyticsOrganizationUrl, String projectName) {
+    public AzureDevOpsClient(String organizationUrl, AzureDevOpsAuthenticator authenticator, String analyticsOrganizationUrl) {
         this.organizationUrl = organizationUrl;
         this.analyticsOrganizationUrl = analyticsOrganizationUrl;
         this.authenticator = authenticator;
         this.client = HttpClient.newHttpClient();
-        this.projectName = projectName;
     }
 
     public String getWorItems(String userStoryId, Long userId, String board) throws Exception {
@@ -34,7 +32,7 @@ public class AzureDevOpsClient {
                 + "&$filter=WorkItemId%20eq%20" + userStoryId
                 + "&$expand=Links($select=TargetWorkItemId;"
                 + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + authenticator.getLocalAzureUserID(userId)
-                + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,RemainingWork,State,AssignedToUserSK))";
+                + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,RemainingWork,State,AssignedToUserSK,CompletedWork))";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(queryURL))
                 .header("Authorization", authenticator.getAuthHeaderById(userId))

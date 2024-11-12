@@ -38,36 +38,37 @@ public class ActivityRecordController {
         try {
             Optional<UserInformation> existingUserOpt = userInformationService.getUserInformationByUserId(activityRecordDTO.getUserId());
 
-            if (existingUserOpt.isPresent()) {
-                UserInformation existingUser = existingUserOpt.get();
-                String email = existingUser.getEmail();
-                String token = existingUser.getToken();
-
-                if (token != null) {
-                    try {
-                        azureDevOpsClient.getAzureUserIDByEmail(email, token);
-                    } catch (InvalidTokenException e) {
-                        activityRecordService.saveActivityRecord(activityRecordDTO);
-                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido ou expirado.");
-                    } catch (UserNotFoundException e) {
-                        activityRecordService.saveActivityRecord(activityRecordDTO);
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado para o email fornecido.");
-                    }
-                } else {
-                    activityRecordService.saveActivityRecord(activityRecordDTO);
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token necessário para verificação.");
-                }
-            } else {
+            if (existingUserOpt.isEmpty()) {
                 activityRecordService.saveActivityRecord(activityRecordDTO);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado com ID: " + activityRecordDTO.getUserId());
             }
+
+            UserInformation existingUser = existingUserOpt.get();
+            String email = existingUser.getEmail();
+            String token = existingUser.getToken();
+
+            if (token == null) {
+                activityRecordService.saveActivityRecord(activityRecordDTO);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token necessário para verificação.");
+            }
+
+            try {
+                azureDevOpsClient.getAzureUserIDByEmail(email, token);
+            } catch (InvalidTokenException e) {
+                activityRecordService.saveActivityRecord(activityRecordDTO);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido ou expirado.");
+            } catch (UserNotFoundException e) {
+                activityRecordService.saveActivityRecord(activityRecordDTO);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado para o email fornecido.");
+            }
+
+            ActivityRecord savedRecord = activityRecordService.saveActivityRecord(activityRecordDTO);
+            return new ResponseEntity<>(String.valueOf(savedRecord), HttpStatus.CREATED);
+
         } catch (Exception e) {
             activityRecordService.saveActivityRecord(activityRecordDTO);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar o registro de atividade.");
         }
-
-        ActivityRecord savedRecord = activityRecordService.saveActivityRecord(activityRecordDTO);
-        return new ResponseEntity<>(String.valueOf(savedRecord), HttpStatus.CREATED);
     }
 }
 

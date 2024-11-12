@@ -2,52 +2,68 @@ package com.thomsonreuters.ado.Service;
 
 import com.thomsonreuters.ado.Client.AzureDevOpsClient;
 import com.thomsonreuters.ado.Model.ActivityRecord;
+import com.thomsonreuters.ado.Model.TargetWorkItem;
 import com.thomsonreuters.ado.Repository.ActivityRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScheduledUpdateService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ScheduledUpdateService.class);
+
     private final ActivityRecordRepository activityRecordRepository;
     private final AzureDevOpsClient azureDevOpsClient;
+    private final WorkItemService workItemService;
 
     @Autowired
-    public ScheduledUpdateService(ActivityRecordRepository activityRecordRepository, AzureDevOpsClient azureDevOpsClient) {
+    public ScheduledUpdateService(ActivityRecordRepository activityRecordRepository, AzureDevOpsClient azureDevOpsClient, WorkItemService workItemService) {
         this.activityRecordRepository = activityRecordRepository;
         this.azureDevOpsClient = azureDevOpsClient;
+        this.workItemService = workItemService;
     }
 
     @Scheduled(fixedRate = 5000)
     public void updatePendingWorkItems() {
-
         List<ActivityRecord> pendingRecords = activityRecordRepository.findTop20ByStatus(1);
 
         for (ActivityRecord record : pendingRecords) {
-            try {
-                Double updatedRemaingWork = record.getRemainingWork() - parseCompletedWork(record.getCompletedWork());
-                double updatedCompletedWork = parseCompletedWork(record.getCompletedWork()) + parseCompletedWork(record.getCompletedWork());
-                System.out.println(parseCompletedWork(record.getCompletedWork()));
+            updateWorkItem(record);
+        }
+    }
 
-                System.out.println(parseCompletedWork(String.valueOf(updatedCompletedWork)));
+    private void updateWorkItem(ActivityRecord record) {
+        try {
+            String azureDevOpsResponse = azureDevOpsClient.getWorItems(record.getUserStoryId(), record.getUserId().getUserId(), record.getBoard());
+            List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
 
-                String updateQuery = AzureDevOpsClient.UpdateWorkItemQuery(
-                        updatedRemaingWork,
-                        parseCompletedWork(record.getCompletedWork())
+            Optional<TargetWorkItem> targetWorkItemOpt = targetWorkItems.stream()
+                    .filter(item -> item.getWorkItemId() == record.getWorkItemId())
+                    .findFirst();
 
-                );
+            if (targetWorkItemOpt.isPresent()) {
+                TargetWorkItem targetWorkItem = targetWorkItemOpt.get();
+                Double updatedRemainingWork = targetWorkItem.getRemainingWork() - parseCompletedWork(record.getCompletedWork());
+                Double updatedCompletedWork = targetWorkItem.getCompletedWork() + parseCompletedWork(record.getCompletedWork());
+
+                String updateQuery = AzureDevOpsClient.UpdateWorkItemQuery(updatedRemainingWork, updatedCompletedWork);
                 azureDevOpsClient.updateWorkItem(record.getWorkItemId(), updateQuery, record.getUserId().getUserId(), record.getBoard());
 
                 record.setStatus(0);
-
-            } catch (Exception e) {
-                record.setStatus(2);
-                System.err.println("Falha ao atualizar o WorkItem no ADO: " + e.getMessage());
-            } finally {
-                activityRecordRepository.save(record);
+            } else {
+                throw new Exception("WorkItem não encontrada com o ID: " + record.getWorkItemId());
             }
+        } catch (Exception e) {
+            record.setStatus(2);
+            logger.error("Falha ao atualizar WorkItem no ADO: {}", e.getMessage());
+        } finally {
+            activityRecordRepository.save(record);
         }
     }
 

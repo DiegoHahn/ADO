@@ -20,7 +20,6 @@ public class AdoApplication {
 	public AzureDevOpsClient azureDevOpsClient(AzureDevOpsAuthenticator authenticator) {
 		String organizationUrl = "https://dev.azure.com/diego29122/";
 		String analyticsOrganizationUrl = "https://analytics.dev.azure.com/diego29122/";
-		String projectName = "ADO%20Rest/";
-		return new AzureDevOpsClient(organizationUrl, authenticator, analyticsOrganizationUrl, projectName);
+		return new AzureDevOpsClient(organizationUrl, authenticator, analyticsOrganizationUrl);
 	}
 }
