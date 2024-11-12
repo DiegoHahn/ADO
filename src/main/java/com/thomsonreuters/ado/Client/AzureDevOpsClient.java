@@ -28,9 +28,9 @@ public class AzureDevOpsClient {
         this.projectName = projectName;
     }
 
-    public String getWorItems(String userStoryId, Long userId) throws Exception {
-        String queryURL = analyticsOrganizationUrl + projectName
-                + "_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType"
+    public String getWorItems(String userStoryId, Long userId, String board) throws Exception {
+        String queryURL = analyticsOrganizationUrl + board
+                + "/_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType"
                 + "&$filter=WorkItemId%20eq%20" + userStoryId
                 + "&$expand=Links($select=TargetWorkItemId;"
                 + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + authenticator.getLocalAzureUserID(userId)
@@ -84,9 +84,9 @@ public class AzureDevOpsClient {
         throw new Exception("Falha ao recuperar o AzureUserID: " + response.body());
     }
 
-    public void updateWorkItem(int  workItemId, String Query, Long userId) throws Exception {
-        String wiqlUrl = organizationUrl + projectName
-                + "_apis/wit/workitems/" + workItemId
+    public void updateWorkItem(int  workItemId, String Query, Long userId, String board) throws Exception {
+        String wiqlUrl = organizationUrl + board
+                + "/_apis/wit/workitems/" + workItemId
                 + "?api-version=7.0";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(wiqlUrl))

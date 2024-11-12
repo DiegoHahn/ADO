@@ -20,7 +20,7 @@ public class ScheduledUpdateService {
         this.azureDevOpsClient = azureDevOpsClient;
     }
 
-    @Scheduled(fixedRate = 50000)
+    @Scheduled(fixedRate = 5000)
     public void updatePendingWorkItems() {
 
         List<ActivityRecord> pendingRecords = activityRecordRepository.findTop20ByStatus(1);
@@ -28,17 +28,22 @@ public class ScheduledUpdateService {
         for (ActivityRecord record : pendingRecords) {
             try {
                 Double updatedRemaingWork = record.getRemainingWork() - parseCompletedWork(record.getCompletedWork());
+                double updatedCompletedWork = parseCompletedWork(record.getCompletedWork()) + parseCompletedWork(record.getCompletedWork());
+                System.out.println(parseCompletedWork(record.getCompletedWork()));
+
+                System.out.println(parseCompletedWork(String.valueOf(updatedCompletedWork)));
+
                 String updateQuery = AzureDevOpsClient.UpdateWorkItemQuery(
                         updatedRemaingWork,
                         parseCompletedWork(record.getCompletedWork())
 
                 );
-                azureDevOpsClient.updateWorkItem(record.getWorkItemId(), updateQuery, record.getUserId().getUserId());
+                azureDevOpsClient.updateWorkItem(record.getWorkItemId(), updateQuery, record.getUserId().getUserId(), record.getBoard());
 
                 record.setStatus(0);
 
             } catch (Exception e) {
-                record.setStatus(2); // status de erro
+                record.setStatus(2);
                 System.err.println("Falha ao atualizar o WorkItem no ADO: " + e.getMessage());
             } finally {
                 activityRecordRepository.save(record);

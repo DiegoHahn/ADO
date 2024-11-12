@@ -49,7 +49,7 @@ public class ActivityRecordService {
         record.setStatus(1);
 
         UserInformation user = userInformationRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com ID: " + dto.getUserId())); //todo criar uma exceção personalizada para usuario nao encontrado
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com ID: " + dto.getUserId()));
 
         record.setUserId(user);
         return activityRecordRepository.save(record);

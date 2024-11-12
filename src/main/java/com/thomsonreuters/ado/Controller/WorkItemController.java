@@ -22,7 +22,7 @@ public class WorkItemController {
 
     @PostMapping("/userstory")
     public ResponseEntity<List<TargetWorkItem>> getTargetWorkItemsForUserStory(@RequestBody UserStoryRequest request) throws Exception {
-        String azureDevOpsResponse = azureDevOpsClient.getWorItems(request.getUserStoryId(), request.getUserId());
+        String azureDevOpsResponse = azureDevOpsClient.getWorItems(request.getUserStoryId(), request.getUserId(), request.getBoard());
         try {
             List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
             return ResponseEntity.ok(targetWorkItems);
