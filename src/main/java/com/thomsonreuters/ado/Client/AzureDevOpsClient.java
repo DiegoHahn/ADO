@@ -26,7 +26,7 @@ public class AzureDevOpsClient {
         this.analyticsOrganizationUrl = analyticsOrganizationUrl;
         this.authenticator = authenticator;
         this.client = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10))
+                .connectTimeout(Duration.ofSeconds(10)) // Timeout de conexão
                 .build();
     }
 
@@ -56,6 +56,41 @@ public class AzureDevOpsClient {
         }
     }
 
+//    public String getAzureUserIDByEmail(String userEmail, String token) throws InvalidTokenException, UserNotFoundException, Exception {
+//        String analyticsUrl = analyticsOrganizationUrl
+//                + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
+//                + userEmail
+//                + "'&$select=UserSK";
+//        HttpRequest request = HttpRequest.newBuilder()
+//                .uri(new URI(analyticsUrl))
+//                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((":" + token).getBytes()))
+//                .header("Content-Type", "application/json")
+//                .timeout(Duration.ofSeconds(10)) // Timeout de leitura
+//                .GET()
+//                .build();
+//        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//
+//        if (response.statusCode() == 401) {
+//            throw new InvalidTokenException("Token inválido ou expirado.");
+//        }
+//
+//        //todo: refatorar ifs encadeados
+//        if (response.statusCode() == 200) {
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            JsonNode rootNode = objectMapper.readTree(response.body());
+//            JsonNode valueNode = rootNode.path("value");
+//
+//            if (valueNode.isArray() && !valueNode.isEmpty()) {
+//                String userSK = valueNode.get(0).path("UserSK").asText();
+//                if (!userSK.isEmpty()) {
+//                    return userSK;
+//                }
+//            }
+//            throw new UserNotFoundException("Usuário não encontrado para o email fornecido.");
+//        }
+//        throw new Exception("Falha ao recuperar o AzureUserID: " + response.body());
+//    }
+
     public String getAzureUserIDByEmail(String userEmail, String token) throws InvalidTokenException, UserNotFoundException, Exception {
         String analyticsUrl = analyticsOrganizationUrl
                 + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
@@ -65,7 +100,7 @@ public class AzureDevOpsClient {
                 .uri(new URI(analyticsUrl))
                 .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((":" + token).getBytes()))
                 .header("Content-Type", "application/json")
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofSeconds(10)) // Timeout de leitura
                 .GET()
                 .build();
 
@@ -96,26 +131,22 @@ public class AzureDevOpsClient {
         }
     }
 
-    public void updateWorkItem(int workItemId, String query, Long userId, String board) throws Exception {
+    public void updateWorkItem(int  workItemId, String Query, Long userId, String board) throws Exception {
         String wiqlUrl = organizationUrl + board
                 + "/_apis/wit/workitems/" + workItemId
                 + "?api-version=7.0";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(wiqlUrl))
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(query))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(Query))
                 .header("Authorization", authenticator.getAuthHeaderById(userId))
                 .header("Content-Type", "application/json-patch+json")
                 .timeout(Duration.ofSeconds(10))
                 .build();
 
-        try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() != 200) {
-                throw new Exception("Failed to execute WIQL query: " + response.body());
-            }
-        } catch (HttpTimeoutException e) {
-            throw new HttpTimeoutException("Request to Azure DevOps API timed out.");
+        if (response.statusCode() != 200) {
+            throw new Exception("Failed to execute WIQL query: " + response.body());
         }
     }
 
