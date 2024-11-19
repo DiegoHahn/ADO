@@ -56,41 +56,6 @@ public class AzureDevOpsClient {
         }
     }
 
-//    public String getAzureUserIDByEmail(String userEmail, String token) throws InvalidTokenException, UserNotFoundException, Exception {
-//        String analyticsUrl = analyticsOrganizationUrl
-//                + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
-//                + userEmail
-//                + "'&$select=UserSK";
-//        HttpRequest request = HttpRequest.newBuilder()
-//                .uri(new URI(analyticsUrl))
-//                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((":" + token).getBytes()))
-//                .header("Content-Type", "application/json")
-//                .timeout(Duration.ofSeconds(10)) // Timeout de leitura
-//                .GET()
-//                .build();
-//        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-//
-//        if (response.statusCode() == 401) {
-//            throw new InvalidTokenException("Token inválido ou expirado.");
-//        }
-//
-//        //todo: refatorar ifs encadeados
-//        if (response.statusCode() == 200) {
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            JsonNode rootNode = objectMapper.readTree(response.body());
-//            JsonNode valueNode = rootNode.path("value");
-//
-//            if (valueNode.isArray() && !valueNode.isEmpty()) {
-//                String userSK = valueNode.get(0).path("UserSK").asText();
-//                if (!userSK.isEmpty()) {
-//                    return userSK;
-//                }
-//            }
-//            throw new UserNotFoundException("Usuário não encontrado para o email fornecido.");
-//        }
-//        throw new Exception("Falha ao recuperar o AzureUserID: " + response.body());
-//    }
-
     public String getAzureUserIDByEmail(String userEmail, String token) throws InvalidTokenException, UserNotFoundException, Exception {
         String analyticsUrl = analyticsOrganizationUrl
                 + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
