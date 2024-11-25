@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -42,7 +43,7 @@ public class ActivityRecordService {
         record.setRemainingWork(dto.getRemainingWork());
 
         if (dto.getStartTime() != null) {
-            record.setStartTime(LocalTime.parse(dto.getStartTime()));
+            record.setStartTime(OffsetDateTime.parse(dto.getStartTime()));
         }
 
         record.setCompletedWork(dto.getCompletedWork());
@@ -53,6 +54,11 @@ public class ActivityRecordService {
 
         record.setUserId(user);
         return activityRecordRepository.save(record);
+    }
+
+    //todo:filtrar por data na query?
+    public List<ActivityRecord> getActivityRecordsByUserId(Long userId) {
+        return activityRecordRepository.findByStatusAndUserId(0, userId);
     }
 
     public void updateActivityRecordsStatus(Long userId, int oldStatus, int newStatus) {

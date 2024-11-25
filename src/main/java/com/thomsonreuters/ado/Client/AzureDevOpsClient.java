@@ -26,7 +26,7 @@ public class AzureDevOpsClient {
         this.analyticsOrganizationUrl = analyticsOrganizationUrl;
         this.authenticator = authenticator;
         this.client = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(10)) // Timeout de conexão
+                .connectTimeout(Duration.ofSeconds(10))
                 .build();
     }
 
@@ -65,7 +65,7 @@ public class AzureDevOpsClient {
                 .uri(new URI(analyticsUrl))
                 .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((":" + token).getBytes()))
                 .header("Content-Type", "application/json")
-                .timeout(Duration.ofSeconds(10)) // Timeout de leitura
+                .timeout(Duration.ofSeconds(10))
                 .GET()
                 .build();
 

@@ -2,6 +2,7 @@ package com.thomsonreuters.ado.Model;
 
 import jakarta.persistence.*;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "activity_records")
@@ -29,7 +30,7 @@ public class ActivityRecord {
 
     @Column(name = "remaining_work")
     private Double remainingWork;
-    private LocalTime startTime;
+    private OffsetDateTime startTime;
 
     @Column(name = "completed_work")
     private String completedWork;
@@ -43,7 +44,7 @@ public class ActivityRecord {
 
     public ActivityRecord() {}
 
-    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime startTime, String completedWork, int status, UserInformation userId) {
+    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, OffsetDateTime startTime, String completedWork, int status, UserInformation userId) {
         this.id = id;
         this.board = board;
         this.userStoryId = userStoryId;
@@ -143,11 +144,11 @@ public class ActivityRecord {
         this.remainingWork = remainingWork;
     }
 
-    public LocalTime getStartTime() {
+    public OffsetDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalTime startTime) {
+    public void setStartTime(OffsetDateTime startTime) {
         this.startTime = startTime;
     }
 
