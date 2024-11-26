@@ -9,6 +9,7 @@ import com.thomsonreuters.ado.Model.UserInformation;
 import com.thomsonreuters.ado.Service.ActivityRecordService;
 import com.thomsonreuters.ado.Service.UserInformationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -70,14 +71,12 @@ public class ActivityRecordController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ActivityRecord>> getActivityRecordById(@RequestParam Long id) {
-        List<ActivityRecord> activityRecordOpt = activityRecordService.getActivityRecordsByUserId(id);
-
-        if (activityRecordOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        return new ResponseEntity<>(activityRecordOpt, HttpStatus.OK);
+    public ResponseEntity<Page<ActivityRecord>> getActivityRecordsByDate(
+            @RequestParam Long userId,
+            @RequestParam int page,
+            @RequestParam int size) {
+        Page<ActivityRecord> activityRecords = activityRecordService.getActivityRecordsByDate(userId, page, size);
+        return new ResponseEntity<>(activityRecords, HttpStatus.OK);
     }
 }
 

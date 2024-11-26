@@ -7,6 +7,9 @@ import com.thomsonreuters.ado.Model.UserInformation;
 import com.thomsonreuters.ado.Repository.ActivityRecordRepository;
 import com.thomsonreuters.ado.Repository.UserInformationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -56,9 +59,9 @@ public class ActivityRecordService {
         return activityRecordRepository.save(record);
     }
 
-    //todo:filtrar por data na query?
-    public List<ActivityRecord> getActivityRecordsByUserId(Long userId) {
-        return activityRecordRepository.findByStatusAndUserId(0, userId);
+    public Page<ActivityRecord> getActivityRecordsByDate(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return activityRecordRepository.findByDate(userId, pageable);
     }
 
     public void updateActivityRecordsStatus(Long userId, int oldStatus, int newStatus) {
