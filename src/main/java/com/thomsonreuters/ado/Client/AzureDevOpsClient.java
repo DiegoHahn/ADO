@@ -32,11 +32,11 @@ public class AzureDevOpsClient {
 
     public String getWorItems(String userStoryId, Long userId, String board) throws Exception {
         String queryURL = analyticsOrganizationUrl + board
-                + "/_odata/v4.0-preview/WorkItems?$select=WorkItemId,AssignedToUserSK,WorkItemType"
+                + "/_odata/v4.0-preview/WorkItems?$select=WorkItemId,WorkItemType"
                 + "&$filter=WorkItemId%20eq%20" + userStoryId
                 + "&$expand=Links($select=TargetWorkItemId;"
                 + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + authenticator.getLocalAzureUserID(userId)
-                + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,RemainingWork,State,AssignedToUserSK,CompletedWork))";
+                + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,RemainingWork,State,CompletedWork))";
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI(queryURL))
                 .header("Authorization", authenticator.getAuthHeaderById(userId))

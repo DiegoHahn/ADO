@@ -8,10 +8,10 @@ public class ActivityRecordDTO {
     private Double originalEstimate;
     private Double remainingWork;
     private String startTime;
-    private String completedWork;
+    private String currentTrackedTime;
     private Long userId;
 
-    public ActivityRecordDTO(String board, String userStoryId, boolean concluded, TargetWorkItem task, Double originalEstimate, Double remainingWork, String startTime, String completedWork, Long userId) {
+    public ActivityRecordDTO(String board, String userStoryId, boolean concluded, TargetWorkItem task, Double originalEstimate, Double remainingWork, String startTime, String currentTrackedTime, Long userId) {
         this.board = board;
         this.userStoryId = userStoryId;
         this.concluded = concluded;
@@ -19,7 +19,7 @@ public class ActivityRecordDTO {
         this.originalEstimate = originalEstimate;
         this.remainingWork = remainingWork;
         this.startTime = startTime;
-        this.completedWork = completedWork;
+        this.currentTrackedTime = currentTrackedTime;
         this.userId = userId;
     }
     
@@ -79,12 +79,12 @@ public class ActivityRecordDTO {
         this.startTime = startTime;
     }
 
-    public String getCompletedWork() {
-        return completedWork;
+    public String getcurrentTrackedTime() {
+        return currentTrackedTime;
     }
 
-    public void setCompletedWork(String completedWork) {
-        this.completedWork = completedWork;
+    public void setcurrentTrackedTime(String currentTrackedTime) {
+        this.currentTrackedTime = currentTrackedTime;
     }
 
     public Long getUserId() {

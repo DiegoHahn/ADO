@@ -37,9 +37,9 @@ public class ActivityRecordService {
 
         if (dto.getTask() != null) {
             record.setWorkItemId(dto.getTask().getWorkItemId());
-            record.setAssignedToUserSK(dto.getTask().getAssignedToUserSK());
             record.setTitle(dto.getTask().getTitle());
             record.setState(dto.getTask().getState());
+            record.setCompletedWork(String.valueOf(dto.getTask().getCompletedWork()));
         }
 
         record.setOriginalEstimate(dto.getOriginalEstimate());
@@ -49,7 +49,7 @@ public class ActivityRecordService {
             record.setStartTime(OffsetDateTime.parse(dto.getStartTime()));
         }
 
-        record.setCompletedWork(dto.getCompletedWork());
+        record.setCurrentTrackedTime(dto.getcurrentTrackedTime());
         record.setStatus(1);
 
         UserInformation user = userInformationRepository.findById(dto.getUserId())

@@ -32,7 +32,6 @@ public class WorkItemService {
 				JsonNode targetWorkItemNode = linkNode.get("TargetWorkItem");
 				TargetWorkItem targetWorkItem = new TargetWorkItem(
 						targetWorkItemNode.get("WorkItemId").asInt(),
-						targetWorkItemNode.get("AssignedToUserSK").asText(),
 						targetWorkItemNode.get("Title").asText(),
 						targetWorkItemNode.get("State").asText(),
 						targetWorkItemNode.get("OriginalEstimate").isNull() ? 0 : targetWorkItemNode.get("OriginalEstimate").asDouble(),

@@ -19,7 +19,6 @@ public class ActivityRecord {
 
     @Column(name = "work_item_id")
     private int workItemId;
-    private String assignedToUserSK;
 
     @Column(name = "title")
     private String title;
@@ -35,6 +34,9 @@ public class ActivityRecord {
     @Column(name = "completed_work")
     private String completedWork;
 
+    @Column(name = "currente_tracked_time")
+    private String currentTrackedTime;
+
     @Column
     private int status;
 
@@ -42,26 +44,27 @@ public class ActivityRecord {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private UserInformation userId;
 
-    public ActivityRecord() {}
+    public ActivityRecord() {
+    }
 
-    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, OffsetDateTime startTime, String completedWork, int status, UserInformation userId) {
+    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String title, String state, Double originalEstimate, Double remainingWork, OffsetDateTime startTime, String completedWork, String currentTrackedTime, int status, UserInformation userId) {
         this.id = id;
         this.board = board;
         this.userStoryId = userStoryId;
         this.concluded = concluded;
         this.workItemId = workItemId;
-        this.assignedToUserSK = assignedToUserSK;
         this.title = title;
         this.state = state;
         this.originalEstimate = originalEstimate;
         this.remainingWork = remainingWork;
         this.startTime = startTime;
         this.completedWork = completedWork;
+        this.currentTrackedTime = currentTrackedTime;
         this.status = status;
         this.userId = userId;
     }
 
-    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime parse, String completedWork) {
+    public ActivityRecord(Long id, String board, String userStoryId, boolean concluded, int workItemId, String assignedToUserSK, String title, String state, Double originalEstimate, Double remainingWork, LocalTime parse, String completedWork, String currentTrackedTime) {
     }
 
     public Long getId() {
@@ -102,14 +105,6 @@ public class ActivityRecord {
 
     public void setWorkItemId(int workItemId) {
         this.workItemId = workItemId;
-    }
-
-    public String getAssignedToUserSK() {
-        return assignedToUserSK;
-    }
-
-    public void setAssignedToUserSK(String assignedToUserSK) {
-        this.assignedToUserSK = assignedToUserSK;
     }
 
     public String getTitle() {
@@ -174,5 +169,13 @@ public class ActivityRecord {
 
     public void setUserId(UserInformation user) {
         this.userId = user;
+    }
+
+    public String getCurrentTrackedTime() {
+        return currentTrackedTime;
+    }
+
+    public void setCurrentTrackedTime(String currentTrackedTime) {
+        this.currentTrackedTime = currentTrackedTime;
     }
 }

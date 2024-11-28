@@ -49,8 +49,8 @@ public class ScheduledUpdateService {
 
             if (targetWorkItemOpt.isPresent()) {
                 TargetWorkItem targetWorkItem = targetWorkItemOpt.get();
-                Double updatedRemainingWork = targetWorkItem.getRemainingWork() - parseCompletedWork(record.getCompletedWork());
-                Double updatedCompletedWork = targetWorkItem.getCompletedWork() + parseCompletedWork(record.getCompletedWork());
+                Double updatedRemainingWork = targetWorkItem.getRemainingWork() - parseCompletedWork(record.getCurrentTrackedTime());
+                Double updatedCompletedWork = targetWorkItem.getCompletedWork() + parseCompletedWork(record.getCurrentTrackedTime());
 
                 String updateQuery = AzureDevOpsClient.UpdateWorkItemQuery(updatedRemainingWork, updatedCompletedWork);
                 azureDevOpsClient.updateWorkItem(record.getWorkItemId(), updateQuery, record.getUserId().getUserId(), record.getBoard());
