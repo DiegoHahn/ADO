@@ -3,11 +3,13 @@ package com.thomsonreuters.ado.Service;
 import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
 import com.thomsonreuters.ado.Model.ActivityRecord;
 import com.thomsonreuters.ado.Model.ActivityRecordDTO;
+import com.thomsonreuters.ado.Model.ActivityRecordResponseDTO;
 import com.thomsonreuters.ado.Model.UserInformation;
 import com.thomsonreuters.ado.Repository.ActivityRecordRepository;
 import com.thomsonreuters.ado.Repository.UserInformationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ActivityRecordService {
@@ -59,9 +62,23 @@ public class ActivityRecordService {
         return activityRecordRepository.save(record);
     }
 
-    public Page<ActivityRecord> getActivityRecordsByDate(Long userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return activityRecordRepository.findByDate(userId, pageable);
+    private ActivityRecordResponseDTO convertToResponseDTO(ActivityRecord record) {
+        ActivityRecordResponseDTO dto = new ActivityRecordResponseDTO();
+        dto.setId(record.getId());
+        dto.setBoard(record.getBoard());
+        dto.setUserStoryId(record.getUserStoryId());
+        dto.setConcluded(record.isConcluded());
+        dto.setWorkItemId(record.getWorkItemId());
+        dto.setTitle(record.getTitle());
+        dto.setState(record.getState());
+        dto.setOriginalEstimate(record.getOriginalEstimate());
+        dto.setRemainingWork(record.getRemainingWork());
+        dto.setStartTime(record.getStartTime());
+        dto.setCompletedWork(record.getCompletedWork());
+        dto.setCurrentTrackedTime(record.getCurrentTrackedTime());
+        dto.setStatus(record.getStatus());
+        dto.setUserId(record.getUserId().getUserId());
+        return dto;
     }
 
     public void updateActivityRecordsStatus(Long userId, int oldStatus, int newStatus) {
@@ -70,5 +87,17 @@ public class ActivityRecordService {
             record.setStatus(newStatus);
             activityRecordRepository.save(record);
         }
+    }
+
+    public Page<ActivityRecordResponseDTO> getActivityRecordsByDate(Long userId,String date, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ActivityRecord> activityRecordsPage = activityRecordRepository.findByDate(userId, date, pageable);
+
+        List<ActivityRecordResponseDTO> activityRecordResponseDTOs = activityRecordsPage.getContent().stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(activityRecordResponseDTOs, pageable, activityRecordsPage.getTotalElements());
     }
 }

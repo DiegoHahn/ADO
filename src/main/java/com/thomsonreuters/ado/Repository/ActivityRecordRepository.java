@@ -17,6 +17,9 @@ public interface ActivityRecordRepository extends JpaRepository<ActivityRecord, 
     @Query(value = "SELECT * FROM activity_records WHERE status = :status AND user_id = :userId", nativeQuery = true)
     List<ActivityRecord> findByStatusAndUserId(@Param("status") int status, @Param("userId") Long userId);
 
-    @Query(value = "SELECT * FROM activity_records WHERE status = 0 AND user_id = :userId", nativeQuery = true)
-    Page<ActivityRecord> findByDate(@Param("userId") Long userId, Pageable pageable);
+//    @Query(value = "SELECT * FROM activity_records WHERE status = 0 AND user_id = :userId", nativeQuery = true)
+//    Page<ActivityRecord> findByDate(@Param("userId") Long userId, Pageable pageable);
+
+    @Query(value = "SELECT * FROM activity_records WHERE status = 0 AND user_id = :userId AND DATE(start_time) = :date", nativeQuery = true)
+    Page<ActivityRecord> findByDate(@Param("userId") Long userId, @Param("date") String date, Pageable pageable);
 }

@@ -5,6 +5,7 @@ import com.thomsonreuters.ado.Exceptions.InvalidTokenException;
 import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
 import com.thomsonreuters.ado.Model.ActivityRecord;
 import com.thomsonreuters.ado.Model.ActivityRecordDTO;
+import com.thomsonreuters.ado.Model.ActivityRecordResponseDTO;
 import com.thomsonreuters.ado.Model.UserInformation;
 import com.thomsonreuters.ado.Service.ActivityRecordService;
 import com.thomsonreuters.ado.Service.UserInformationService;
@@ -71,11 +72,12 @@ public class ActivityRecordController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ActivityRecord>> getActivityRecordsByDate(
+    public ResponseEntity<Page<ActivityRecordResponseDTO>> getActivityRecordsByDate(
             @RequestParam Long userId,
+            @RequestParam String date,
             @RequestParam int page,
             @RequestParam int size) {
-        Page<ActivityRecord> activityRecords = activityRecordService.getActivityRecordsByDate(userId, page, size);
+        Page<ActivityRecordResponseDTO> activityRecords = activityRecordService.getActivityRecordsByDate(userId, date,  page, size);
         return new ResponseEntity<>(activityRecords, HttpStatus.OK);
     }
 }
