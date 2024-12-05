@@ -71,13 +71,23 @@ public class ActivityRecordController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/byDate")
     public ResponseEntity<Page<ActivityRecordResponseDTO>> getActivityRecordsByDate(
             @RequestParam Long userId,
             @RequestParam String date,
             @RequestParam int page,
             @RequestParam int size) {
         Page<ActivityRecordResponseDTO> activityRecords = activityRecordService.getActivityRecordsByDate(userId, date,  page, size);
+        return new ResponseEntity<>(activityRecords, HttpStatus.OK);
+    }
+
+    @GetMapping("/byWorkItemID")
+    public ResponseEntity<Page<ActivityRecordResponseDTO>> getActivityRecordsByWorkItemID(
+            @RequestParam Long userId,
+            @RequestParam int workItemID,
+            @RequestParam int page,
+            @RequestParam int size) {
+        Page<ActivityRecordResponseDTO> activityRecords = activityRecordService.getActivityRecordsByWorkItemID(userId, workItemID,  page, size);
         return new ResponseEntity<>(activityRecords, HttpStatus.OK);
     }
 }

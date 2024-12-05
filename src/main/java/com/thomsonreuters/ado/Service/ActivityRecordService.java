@@ -92,7 +92,20 @@ public class ActivityRecordService {
     public Page<ActivityRecordResponseDTO> getActivityRecordsByDate(Long userId,String date, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
+        System.out.printf("userId: %d, date: %s, page: %d, size: %d\n", userId, date, page, size);
         Page<ActivityRecord> activityRecordsPage = activityRecordRepository.findByDate(userId, date, pageable);
+
+        List<ActivityRecordResponseDTO> activityRecordResponseDTOs = activityRecordsPage.getContent().stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(activityRecordResponseDTOs, pageable, activityRecordsPage.getTotalElements());
+    }
+
+    public Page<ActivityRecordResponseDTO> getActivityRecordsByWorkItemID(Long userId, int workItemID, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<ActivityRecord> activityRecordsPage = activityRecordRepository.findByWorkItemId(userId, workItemID, pageable);
 
         List<ActivityRecordResponseDTO> activityRecordResponseDTOs = activityRecordsPage.getContent().stream()
                 .map(this::convertToResponseDTO)
