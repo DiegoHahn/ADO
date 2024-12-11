@@ -33,61 +33,94 @@ public class ActivityRecordController {
         this.azureDevOpsClient = azureDevOpsClient;
     }
 
-    @PostMapping
-    public ResponseEntity<String> createActivityRecord(@RequestBody ActivityRecordDTO activityRecordDTO) throws UserNotFoundException {
-        try {
-            Optional<UserInformation> existingUserOpt = userInformationService.getUserInformationByUserId(activityRecordDTO.getUserId());
+//    @PostMapping
+//    public ResponseEntity<String> createActivityRecord(@RequestBody ActivityRecordDTO activityRecordDTO) throws UserNotFoundException {
+//        try {
+//            Optional<UserInformation> existingUserOpt = userInformationService.getUserInformationByUserId(activityRecordDTO.getUserId());
+//
+//            if (existingUserOpt.isEmpty()) {
+//                activityRecordService.saveActivityRecord(activityRecordDTO);
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado com ID: " + activityRecordDTO.getUserId());
+//            }
+//
+//            UserInformation existingUser = existingUserOpt.get();
+//            String email = existingUser.getEmail();
+//            String token = existingUser.getToken();
+//
+//            if (token == null) {
+//                activityRecordService.saveActivityRecord(activityRecordDTO);
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token necessário para verificação.");
+//            }
+//
+//            try {
+//                azureDevOpsClient.getAzureUserIDByEmail(email, token);
+//            } catch (InvalidTokenException e) {
+//                activityRecordService.saveActivityRecord(activityRecordDTO);
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido ou expirado.");
+//            } catch (UserNotFoundException e) {
+//                activityRecordService.saveActivityRecord(activityRecordDTO);
+//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado para o email fornecido.");
+//            }
+//
+//            ActivityRecord savedRecord = activityRecordService.saveActivityRecord(activityRecordDTO);
+//            return new ResponseEntity<>(String.valueOf(savedRecord), HttpStatus.CREATED);
+//
+//        } catch (Exception e) {
+//            activityRecordService.saveActivityRecord(activityRecordDTO);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar o registro de atividade.");
+//        }
+//    }
+@PostMapping
+public ResponseEntity<?> createActivityRecord(@RequestBody ActivityRecordDTO activityRecordDTO) throws UserNotFoundException {
+    ActivityRecord savedRecord = activityRecordService.saveActivityRecord(activityRecordDTO);
 
-            if (existingUserOpt.isEmpty()) {
-                activityRecordService.saveActivityRecord(activityRecordDTO);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado com ID: " + activityRecordDTO.getUserId());
-            }
+    try {
+        Optional<UserInformation> existingUserOpt = userInformationService.getUserInformationByUserId(activityRecordDTO.getUserId());
 
-            UserInformation existingUser = existingUserOpt.get();
-            String email = existingUser.getEmail();
-            String token = existingUser.getToken();
-
-            if (token == null) {
-                activityRecordService.saveActivityRecord(activityRecordDTO);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token necessário para verificação.");
-            }
-
-            try {
-                azureDevOpsClient.getAzureUserIDByEmail(email, token);
-            } catch (InvalidTokenException e) {
-                activityRecordService.saveActivityRecord(activityRecordDTO);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido ou expirado.");
-            } catch (UserNotFoundException e) {
-                activityRecordService.saveActivityRecord(activityRecordDTO);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado para o email fornecido.");
-            }
-
-            ActivityRecord savedRecord = activityRecordService.saveActivityRecord(activityRecordDTO);
-            return new ResponseEntity<>(String.valueOf(savedRecord), HttpStatus.CREATED);
-
-        } catch (Exception e) {
-            activityRecordService.saveActivityRecord(activityRecordDTO);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar o registro de atividade.");
+        if (existingUserOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Usuário não encontrado com ID: " + activityRecordDTO.getUserId());
         }
+
+        UserInformation existingUser = existingUserOpt.get();
+        String email = existingUser.getEmail();
+        String token = existingUser.getToken();
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Token necessário para verificação.");
+        }
+
+        try {
+            azureDevOpsClient.getAzureUserIDByEmail(email, token);
+        } catch (InvalidTokenException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Token inválido ou expirado.");
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Usuário não encontrado para o email fornecido.");
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(activityRecordDTO);
+
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Erro ao processar o registro de atividade.");
     }
+}
 
     @GetMapping("/byDate")
-    public ResponseEntity<Page<ActivityRecordResponseDTO>> getActivityRecordsByDate(
+    public ResponseEntity <List<ActivityRecordResponseDTO>> getActivityRecordsByDate(
             @RequestParam Long userId,
-            @RequestParam String date,
-            @RequestParam int page,
-            @RequestParam int size) {
-        Page<ActivityRecordResponseDTO> activityRecords = activityRecordService.getActivityRecordsByDate(userId, date,  page, size);
+            @RequestParam String date) {
+        List<ActivityRecordResponseDTO> activityRecords = activityRecordService.getActivityRecordsByDate(userId, date);
         return new ResponseEntity<>(activityRecords, HttpStatus.OK);
     }
 
     @GetMapping("/byWorkItemID")
-    public ResponseEntity<Page<ActivityRecordResponseDTO>> getActivityRecordsByWorkItemID(
+    public ResponseEntity<List<ActivityRecordResponseDTO>> getActivityRecordsByWorkItemID(
             @RequestParam Long userId,
-            @RequestParam int workItemID,
-            @RequestParam int page,
-            @RequestParam int size) {
-        Page<ActivityRecordResponseDTO> activityRecords = activityRecordService.getActivityRecordsByWorkItemID(userId, workItemID,  page, size);
+            @RequestParam int workItemID) {
+        List<ActivityRecordResponseDTO> activityRecords = activityRecordService.getActivityRecordsByWorkItemID(userId, workItemID);
         return new ResponseEntity<>(activityRecords, HttpStatus.OK);
     }
 }

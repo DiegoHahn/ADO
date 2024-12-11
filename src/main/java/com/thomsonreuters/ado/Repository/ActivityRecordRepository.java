@@ -18,8 +18,8 @@ public interface ActivityRecordRepository extends JpaRepository<ActivityRecord, 
     List<ActivityRecord> findByStatusAndUserId(@Param("status") int status, @Param("userId") Long userId);
 
     @Query(value = "SELECT * FROM activity_records WHERE status = 0 AND user_id = :userId AND DATE(start_time AT TIME ZONE 'UTC') = TO_DATE(:date, 'YYYY-MM-DD')", nativeQuery = true)
-    Page<ActivityRecord> findByDate(@Param("userId") Long userId, @Param("date") String date, Pageable pageable);
+    List<ActivityRecord> findByDate(@Param("userId") Long userId, @Param("date") String date);
 
     @Query(value = "SELECT * FROM activity_records WHERE status = 0 AND user_id = :userId AND work_item_id = :workItemID", nativeQuery = true)
-    Page<ActivityRecord> findByWorkItemId(Long userId, int workItemID, Pageable pageable);
+    List<ActivityRecord> findByWorkItemId(@Param("userId")Long userId, @Param("workItemID") int workItemID);
 }
