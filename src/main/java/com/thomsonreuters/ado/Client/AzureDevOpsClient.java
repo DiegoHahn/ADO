@@ -115,7 +115,7 @@ public class AzureDevOpsClient {
         }
     }
 
-    public static String UpdateWorkItemQuery(Double remainingWork, Double completedWork) {
+    public static String UpdateWorkItemQueryCompletedAndRemaining(Double remainingWork, Double completedWork) {
         return String.format(Locale.US, """
             [
                 {
@@ -130,6 +130,18 @@ public class AzureDevOpsClient {
                 }
             ]
             """, remainingWork, completedWork);
+    }
+
+    public static String UpdateWorkItemQueryCompleted(Double completedWork) {
+        return String.format(Locale.US, """
+            [
+                {
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.CompletedWork",
+                    "value": %.2f
+                }
+            ]
+            """, completedWork);
     }
 }
 

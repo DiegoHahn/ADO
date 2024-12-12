@@ -23,7 +23,11 @@ public class ScheduledUpdateService {
     private final WorkItemService workItemService;
 
     @Autowired
-    public ScheduledUpdateService(ActivityRecordRepository activityRecordRepository, AzureDevOpsClient azureDevOpsClient, WorkItemService workItemService) {
+    public ScheduledUpdateService(
+            ActivityRecordRepository activityRecordRepository,
+            AzureDevOpsClient azureDevOpsClient,
+            WorkItemService workItemService
+    ) {
         this.activityRecordRepository = activityRecordRepository;
         this.azureDevOpsClient = azureDevOpsClient;
         this.workItemService = workItemService;
@@ -40,30 +44,65 @@ public class ScheduledUpdateService {
 
     private void updateWorkItem(ActivityRecord record) {
         try {
-            String azureDevOpsResponse = azureDevOpsClient.getWorItems(record.getUserStoryId(), record.getUserId().getUserId(), record.getBoard());
-            List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
+            Optional<TargetWorkItem> targetWorkItemOpt = findTargetWorkItem(record);
 
-            Optional<TargetWorkItem> targetWorkItemOpt = targetWorkItems.stream()
-                    .filter(item -> item.getWorkItemId() == record.getWorkItemId())
-                    .findFirst();
-
-            if (targetWorkItemOpt.isPresent()) {
-                TargetWorkItem targetWorkItem = targetWorkItemOpt.get();
-                Double updatedRemainingWork = targetWorkItem.getRemainingWork() - parseCompletedWork(record.getCurrentTrackedTime());
-                Double updatedCompletedWork = targetWorkItem.getCompletedWork() + parseCompletedWork(record.getCurrentTrackedTime());
-
-                String updateQuery = AzureDevOpsClient.UpdateWorkItemQuery(updatedRemainingWork, updatedCompletedWork);
-                azureDevOpsClient.updateWorkItem(record.getWorkItemId(), updateQuery, record.getUserId().getUserId(), record.getBoard());
-
-                record.setStatus(0);
-            } else {
+            if (targetWorkItemOpt.isEmpty()) {
                 throw new Exception("WorkItem não encontrada com o ID: " + record.getWorkItemId());
             }
+
+            TargetWorkItem targetWorkItem = targetWorkItemOpt.get();
+            double parsedTrackedTime = parseCompletedWork(record.getCurrentTrackedTime());
+
+            double updatedCompletedWork = calculateUpdatedCompletedWork(targetWorkItem, record.getCurrentTrackedTime());
+            Double updatedRemainingWork = calculateUpdatedRemainingWork(targetWorkItem, parsedTrackedTime);
+
+            String updateQuery = (updatedRemainingWork == null)
+                    ? AzureDevOpsClient.UpdateWorkItemQueryCompleted(updatedCompletedWork)
+                    : AzureDevOpsClient.UpdateWorkItemQueryCompletedAndRemaining(updatedRemainingWork, updatedCompletedWork);
+
+            azureDevOpsClient.updateWorkItem(
+                    record.getWorkItemId(),
+                    updateQuery,
+                    record.getUserId().getUserId(),
+                    record.getBoard()
+            );
+
+            record.setStatus(0);
         } catch (Exception e) {
             record.setStatus(2);
             logger.error("Falha ao atualizar WorkItem no ADO: {}", e.getMessage());
         } finally {
             activityRecordRepository.save(record);
+        }
+    }
+
+    private Optional<TargetWorkItem> findTargetWorkItem(ActivityRecord record) throws Exception {
+        String azureDevOpsResponse = azureDevOpsClient.getWorItems(
+                record.getUserStoryId(),
+                record.getUserId().getUserId(),
+                record.getBoard()
+        );
+        List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
+
+        return targetWorkItems.stream()
+                .filter(item -> item.getWorkItemId() == record.getWorkItemId())
+                .findFirst();
+    }
+
+    private double calculateUpdatedCompletedWork(TargetWorkItem targetWorkItem, String currentTrackedTime) {
+        return targetWorkItem.getCompletedWork() + parseCompletedWork(currentTrackedTime);
+    }
+
+    private Double calculateUpdatedRemainingWork(TargetWorkItem targetWorkItem, double parsedTrackedTime) {
+        Double remainingWork = targetWorkItem.getRemainingWork();
+        Double originalEstimate = targetWorkItem.getOriginalEstimate();
+
+        if (remainingWork != null) {
+            return remainingWork - parsedTrackedTime;
+        } else if (originalEstimate != null) {
+            return originalEstimate - parsedTrackedTime;
+        } else {
+            return null;
         }
     }
 
