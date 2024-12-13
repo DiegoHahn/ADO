@@ -42,6 +42,19 @@ public class ScheduledUpdateService {
         }
     }
 
+    private Optional<TargetWorkItem> findTargetWorkItem(ActivityRecord record) throws Exception {
+        String azureDevOpsResponse = azureDevOpsClient.getWorItems(
+                record.getUserStoryId(),
+                record.getUserId().getUserId(),
+                record.getBoard()
+        );
+        List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
+
+        return targetWorkItems.stream()
+                .filter(item -> item.getWorkItemId() == record.getWorkItemId())
+                .findFirst();
+    }
+
     private void updateWorkItem(ActivityRecord record) {
         try {
             Optional<TargetWorkItem> targetWorkItemOpt = findTargetWorkItem(record);
@@ -56,9 +69,14 @@ public class ScheduledUpdateService {
             double updatedCompletedWork = calculateUpdatedCompletedWork(targetWorkItem, record.getCurrentTrackedTime());
             Double updatedRemainingWork = calculateUpdatedRemainingWork(targetWorkItem, parsedTrackedTime);
 
-            String updateQuery = (updatedRemainingWork == null)
-                    ? AzureDevOpsClient.UpdateWorkItemQueryCompleted(updatedCompletedWork)
-                    : AzureDevOpsClient.UpdateWorkItemQueryCompletedAndRemaining(updatedRemainingWork, updatedCompletedWork);
+            String updateQuery;
+            if (record.getState().equals("Closed")) {
+                updateQuery = AzureDevOpsClient.UpdateWorkItemQueryCompleted(updatedCompletedWork);
+            } else {
+                updateQuery = (updatedRemainingWork == null)
+                        ? AzureDevOpsClient.UpdateWorkItemQueryCompleted(updatedCompletedWork)
+                        : AzureDevOpsClient.UpdateWorkItemQueryCompletedAndRemaining(updatedRemainingWork, updatedCompletedWork);
+            }
 
             azureDevOpsClient.updateWorkItem(
                     record.getWorkItemId(),
@@ -74,19 +92,6 @@ public class ScheduledUpdateService {
         } finally {
             activityRecordRepository.save(record);
         }
-    }
-
-    private Optional<TargetWorkItem> findTargetWorkItem(ActivityRecord record) throws Exception {
-        String azureDevOpsResponse = azureDevOpsClient.getWorItems(
-                record.getUserStoryId(),
-                record.getUserId().getUserId(),
-                record.getBoard()
-        );
-        List<TargetWorkItem> targetWorkItems = workItemService.processAzureDevOpsResponse(azureDevOpsResponse);
-
-        return targetWorkItems.stream()
-                .filter(item -> item.getWorkItemId() == record.getWorkItemId())
-                .findFirst();
     }
 
     private double calculateUpdatedCompletedWork(TargetWorkItem targetWorkItem, String currentTrackedTime) {
