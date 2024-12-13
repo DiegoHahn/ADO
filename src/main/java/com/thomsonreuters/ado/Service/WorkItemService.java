@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thomsonreuters.ado.Model.TargetWorkItem;
+import com.thomsonreuters.ado.Model.UserStoryRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +19,39 @@ public class WorkItemService {
 
 	public WorkItemService(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
+	}
+
+	public List<TargetWorkItem> processAzureDevOpsResponse(String jsonResponse, UserStoryRequest request) throws JsonProcessingException {
+		JsonNode rootNode = objectMapper.readTree(jsonResponse);
+		JsonNode valueNode = rootNode.get("value");
+
+		List<TargetWorkItem> targetWorkItems = new ArrayList<>();
+
+		for (JsonNode itemNode : valueNode) {
+			JsonNode linksNode = itemNode.get("Links");
+			for (JsonNode linkNode : linksNode) {
+				JsonNode targetWorkItemNode = linkNode.get("TargetWorkItem");
+				TargetWorkItem targetWorkItem = new TargetWorkItem(
+						targetWorkItemNode.get("WorkItemId").asInt(),
+						targetWorkItemNode.get("Title").asText(),
+						targetWorkItemNode.get("State").asText(),
+						targetWorkItemNode.get("OriginalEstimate").isNull() ? null : targetWorkItemNode.get("OriginalEstimate").asDouble(),
+						targetWorkItemNode.get("RemainingWork").isNull() ? null : targetWorkItemNode.get("RemainingWork").asDouble(),
+						targetWorkItemNode.get("CompletedWork").isNull() ? 0 : targetWorkItemNode.get("CompletedWork").asDouble()
+				);
+				if (request.isConcluded()) {
+					if (!targetWorkItem.getState().equals("Closed")) {
+						targetWorkItems.add(targetWorkItem);
+					}
+				} else {
+					targetWorkItems.add(targetWorkItem);
+				}
+			}
+		}
+
+		return targetWorkItems.stream()
+				.sorted(Comparator.comparingInt(TargetWorkItem::getWorkItemId))
+				.collect(Collectors.toList());
 	}
 
 	public List<TargetWorkItem> processAzureDevOpsResponse(String jsonResponse) throws JsonProcessingException {
