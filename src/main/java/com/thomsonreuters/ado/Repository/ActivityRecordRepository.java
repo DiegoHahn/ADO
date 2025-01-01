@@ -1,13 +1,12 @@
 package com.thomsonreuters.ado.Repository;
 
-import com.thomsonreuters.ado.Model.ActivityRecord;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
+import com.thomsonreuters.ado.Model.ActivityRecord;
 
 public interface ActivityRecordRepository extends JpaRepository<ActivityRecord, Long> {
 
@@ -20,6 +19,6 @@ public interface ActivityRecordRepository extends JpaRepository<ActivityRecord, 
     @Query(value = "SELECT * FROM activity_records WHERE status = 0 AND user_id = :userId AND DATE(start_time AT TIME ZONE 'UTC') = TO_DATE(:date, 'YYYY-MM-DD')", nativeQuery = true)
     List<ActivityRecord> findByDate(@Param("userId") Long userId, @Param("date") String date);
 
-    @Query(value = "SELECT * FROM activity_records WHERE status = 0 AND user_id = :userId AND work_item_id = :workItemID", nativeQuery = true)
-    List<ActivityRecord> findByWorkItemId(@Param("userId")Long userId, @Param("workItemID") int workItemID);
+    @Query(value = "SELECT * FROM activity_records WHERE status = 0 AND user_id = :userId AND work_item_id = :workItemId", nativeQuery = true)
+    List<ActivityRecord> findByWorkItemId(@Param("userId")Long userId, @Param("workItemId") int workItemID);
 }

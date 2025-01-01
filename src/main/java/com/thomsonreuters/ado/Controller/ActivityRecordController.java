@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/activityrecord")
+@RequestMapping("/activityRecord")
 public class ActivityRecordController {
 
     private final ActivityRecordService activityRecordService;
@@ -78,11 +78,11 @@ public class ActivityRecordController {
         return new ResponseEntity<>(activityRecords, HttpStatus.OK);
     }
 
-    @GetMapping("/byWorkItemID")
+    @GetMapping("/byWorkItemId")
     public ResponseEntity<List<ActivityRecordResponseDTO>> getActivityRecordsByWorkItemID(
             @RequestParam Long userId,
-            @RequestParam int workItemID) {
-        List<ActivityRecordResponseDTO> activityRecords = activityRecordService.getActivityRecordsByWorkItemID(userId, workItemID);
+            @RequestParam int workItemId) {
+        List<ActivityRecordResponseDTO> activityRecords = activityRecordService.getActivityRecordsByWorkItemID(userId, workItemId);
         return new ResponseEntity<>(activityRecords, HttpStatus.OK);
     }
 }

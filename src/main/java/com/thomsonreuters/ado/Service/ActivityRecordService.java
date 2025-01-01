@@ -91,8 +91,8 @@ public List<ActivityRecordResponseDTO> getActivityRecordsByDate(Long userId, Str
             .collect(Collectors.toList());
 }
 
-    public List<ActivityRecordResponseDTO> getActivityRecordsByWorkItemID(Long userId, int workItemID) {
-        List<ActivityRecord> activityRecords = activityRecordRepository.findByWorkItemId(userId, workItemID);
+    public List<ActivityRecordResponseDTO> getActivityRecordsByWorkItemID(Long userId, int workItemId) {
+        List<ActivityRecord> activityRecords = activityRecordRepository.findByWorkItemId(userId, workItemId);
         return activityRecords.stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
