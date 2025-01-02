@@ -55,7 +55,7 @@ public class ScheduledUpdateService {
                 .findFirst();
     }
 
-    private void updateWorkItem(ActivityRecord record) {
+    void updateWorkItem(ActivityRecord record) {
         try {
             Optional<TargetWorkItem> targetWorkItemOpt = findTargetWorkItem(record);
 

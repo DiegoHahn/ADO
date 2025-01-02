@@ -17,6 +17,9 @@ public class TargetWorkItem {
         this.completedWork = completedWork;
     }
 
+    public TargetWorkItem() {
+    }
+
     public int getWorkItemId() {
         return workItemId;
     }
