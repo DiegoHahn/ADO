@@ -72,7 +72,13 @@ public class ActivityRecordService {
         dto.setCompletedWork(record.getCompletedWork());
         dto.setCurrentTrackedTime(record.getCurrentTrackedTime());
         dto.setStatus(record.getStatus());
-        dto.setUserId(record.getUserId().getUserId());
+        
+        if (record.getUserId() != null) {
+            dto.setUserId(record.getUserId().getUserId());
+        } else {
+            dto.setUserId(null);
+        }
+
         return dto;
     }
 
