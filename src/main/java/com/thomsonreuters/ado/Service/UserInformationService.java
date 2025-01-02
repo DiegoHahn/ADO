@@ -1,10 +1,11 @@
 package com.thomsonreuters.ado.Service;
 
-import com.thomsonreuters.ado.Model.UserInformation;
-import com.thomsonreuters.ado.Repository.UserInformationRepository;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.thomsonreuters.ado.Model.UserInformation;
+import com.thomsonreuters.ado.Repository.UserInformationRepository;
 
 @Service
 public class UserInformationService {

@@ -1,10 +1,11 @@
 package com.thomsonreuters.ado.Authentication;
 
-import com.thomsonreuters.ado.Model.UserInformation;
-import com.thomsonreuters.ado.Repository.UserInformationRepository;
+import java.util.Base64;
+
 import org.springframework.stereotype.Service;
 
-import java.util.Base64;
+import com.thomsonreuters.ado.Model.UserInformation;
+import com.thomsonreuters.ado.Repository.UserInformationRepository;
 
 @Service
 public class AzureDevOpsAuthenticator {

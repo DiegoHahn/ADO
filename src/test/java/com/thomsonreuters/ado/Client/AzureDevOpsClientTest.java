@@ -26,6 +26,7 @@ import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
 import com.thomsonreuters.ado.Exceptions.InvalidTokenException;
 import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
 
+@SuppressWarnings("unchecked")
 class AzureDevOpsClientTest {
 
     private AzureDevOpsAuthenticator authenticator;

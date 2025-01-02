@@ -1,5 +1,14 @@
 package com.thomsonreuters.ado.Controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.thomsonreuters.ado.Client.AzureDevOpsClient;
 import com.thomsonreuters.ado.Exceptions.InvalidTokenException;
 import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
@@ -9,14 +18,6 @@ import com.thomsonreuters.ado.Model.UserInformationRequest;
 import com.thomsonreuters.ado.Model.UserInformationResponse;
 import com.thomsonreuters.ado.Service.ActivityRecordService;
 import com.thomsonreuters.ado.Service.UserInformationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/userInformation")

@@ -1,5 +1,23 @@
 package com.thomsonreuters.ado.Controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import com.thomsonreuters.ado.Client.AzureDevOpsClient;
 import com.thomsonreuters.ado.Exceptions.InvalidTokenException;
 import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
@@ -9,18 +27,6 @@ import com.thomsonreuters.ado.Model.ActivityRecordResponseDTO;
 import com.thomsonreuters.ado.Model.UserInformation;
 import com.thomsonreuters.ado.Service.ActivityRecordService;
 import com.thomsonreuters.ado.Service.UserInformationService;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 
 

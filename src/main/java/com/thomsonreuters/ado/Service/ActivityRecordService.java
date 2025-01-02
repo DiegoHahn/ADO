@@ -1,5 +1,12 @@
 package com.thomsonreuters.ado.Service;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
 import com.thomsonreuters.ado.Model.ActivityRecord;
 import com.thomsonreuters.ado.Model.ActivityRecordDTO;
@@ -7,12 +14,6 @@ import com.thomsonreuters.ado.Model.ActivityRecordResponseDTO;
 import com.thomsonreuters.ado.Model.UserInformation;
 import com.thomsonreuters.ado.Repository.ActivityRecordRepository;
 import com.thomsonreuters.ado.Repository.UserInformationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ActivityRecordService {

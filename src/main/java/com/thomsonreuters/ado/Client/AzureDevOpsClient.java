@@ -1,11 +1,5 @@
 package com.thomsonreuters.ado.Client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
-import com.thomsonreuters.ado.Exceptions.InvalidTokenException;
-import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -14,6 +8,12 @@ import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Locale;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
+import com.thomsonreuters.ado.Exceptions.InvalidTokenException;
+import com.thomsonreuters.ado.Exceptions.UserNotFoundException;
 
 public class AzureDevOpsClient {
     private final String organizationUrl;

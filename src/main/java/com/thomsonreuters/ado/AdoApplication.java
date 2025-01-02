@@ -1,12 +1,12 @@
 package com.thomsonreuters.ado;
 
-import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
-
-import com.thomsonreuters.ado.Client.AzureDevOpsClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import com.thomsonreuters.ado.Authentication.AzureDevOpsAuthenticator;
+import com.thomsonreuters.ado.Client.AzureDevOpsClient;
 
 @SpringBootApplication
 @EnableScheduling
