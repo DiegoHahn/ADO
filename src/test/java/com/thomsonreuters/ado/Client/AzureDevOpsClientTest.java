@@ -42,7 +42,6 @@ class AzureDevOpsClientTest {
                 "https://analytics.dev.azure.com/fakeOrganization"
         );
 
-        // Inject the mock HttpClient using reflection
         Field clientField = AzureDevOpsClient.class.getDeclaredField("client");
         clientField.setAccessible(true);
         clientField.set(azureDevOpsClient, httpClient);

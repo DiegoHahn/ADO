@@ -11,6 +11,9 @@ public class ActivityRecordDTO {
     private String currentTrackedTime;
     private Long userId;
 
+    public ActivityRecordDTO() {
+    }
+
     public ActivityRecordDTO(String board, String userStoryId, boolean concluded, TargetWorkItem task, Double originalEstimate, Double remainingWork, String startTime, String currentTrackedTime, Long userId) {
         this.board = board;
         this.userStoryId = userStoryId;

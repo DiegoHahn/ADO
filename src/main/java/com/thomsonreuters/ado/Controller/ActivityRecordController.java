@@ -34,9 +34,10 @@ public class ActivityRecordController {
 
     @PostMapping
     public ResponseEntity<?> createActivityRecord(@RequestBody ActivityRecordDTO activityRecordDTO) throws UserNotFoundException {
-        ActivityRecord savedRecord = activityRecordService.saveActivityRecord(activityRecordDTO);
 
         try {
+            activityRecordService.saveActivityRecord(activityRecordDTO);
+
             Optional<UserInformation> existingUserOpt = userInformationService.getUserInformationByUserId(activityRecordDTO.getUserId());
 
             if (existingUserOpt.isEmpty()) {
