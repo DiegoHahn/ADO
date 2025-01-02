@@ -111,7 +111,7 @@ public class ScheduledUpdateService {
         }
     }
 
-    private double parseCompletedWork(String completedWork) {
+    public double parseCompletedWork(String completedWork) {
         String[] timeParts = completedWork.split(":");
         int hours = Integer.parseInt(timeParts[0]);
         int minutes = Integer.parseInt(timeParts[1]);
