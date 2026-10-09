@@ -10,27 +10,15 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>com.thomsonreuters</groupId>
+	<groupId>io.github.diegohahn</groupId>
 	<artifactId>ado</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ado</name>
-	<description>Projeto de registro de atividades na plataforma Azure DevOps</description>
+	<description>Time tracking for Azure DevOps tasks with automatic work item sync</description>
 
 	<properties>
 		<java.version>17</java.version>
 	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.azure</groupId>
-				<artifactId>azure-sdk-bom</artifactId>
-				<version>1.2.26</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -47,34 +35,17 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.azure</groupId>
-			<artifactId>azure-messaging-servicebus</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.azure</groupId>
-			<artifactId>azure-data-appconfiguration</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.azure</groupId>
-			<artifactId>azure-core</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20240303</version>
-		</dependency>
-		<dependency>
-			<groupId>com.azure.resourcemanager</groupId>
-			<artifactId>azure-resourcemanager-devopsinfrastructure</artifactId>
-			<version>1.0.0-beta.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -108,7 +79,7 @@
 						</goals>
 						 <configuration>
 							<excludes>
-								<exclude>com/thomsonreuters/ado/Model/*</exclude>
+								<exclude>io/github/diegohahn/ado/model/*</exclude>
 							</excludes>
                     </configuration>
 					</execution>

@@ -1,0 +1,153 @@
+package io.github.diegohahn.ado.client;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
+import java.time.Duration;
+import java.util.Base64;
+import java.util.Locale;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.diegohahn.ado.authentication.AzureDevOpsAuthenticator;
+import io.github.diegohahn.ado.exceptions.AzureDevOpsApiException;
+import io.github.diegohahn.ado.exceptions.InvalidTokenException;
+import io.github.diegohahn.ado.exceptions.UserNotFoundException;
+
+public class AzureDevOpsClient {
+    private final String organizationUrl;
+    private final AzureDevOpsAuthenticator authenticator;
+    private final HttpClient client;
+    private final String analyticsOrganizationUrl;
+
+    public AzureDevOpsClient(String organizationUrl, AzureDevOpsAuthenticator authenticator, String analyticsOrganizationUrl) {
+        this.organizationUrl = organizationUrl;
+        this.analyticsOrganizationUrl = analyticsOrganizationUrl;
+        this.authenticator = authenticator;
+        this.client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+    }
+
+    public String getWorItems(String userStoryId, Long userId, String board)
+            throws UserNotFoundException, InvalidTokenException, AzureDevOpsApiException, IOException, InterruptedException, URISyntaxException {
+        String queryURL = analyticsOrganizationUrl + board
+                + "/_odata/v4.0-preview/WorkItems?$select=WorkItemId,WorkItemType"
+                + "&$filter=WorkItemId%20eq%20" + userStoryId
+                + "&$expand=Links($select=TargetWorkItemId;"
+                + "$filter=TargetWorkItem/AssignedToUserSK%20eq%20" + authenticator.getLocalAzureUserID(userId)
+                + ";$expand=TargetWorkItem($select=WorkItemId,Title,OriginalEstimate,RemainingWork,State,CompletedWork))";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(queryURL))
+                .header("Authorization", authenticator.getAuthHeaderById(userId))
+                .header("Content-Type", "application/json")
+                .GET().build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                throw new AzureDevOpsApiException("Failed to execute WIQL query: " + response.body());
+            }
+
+            return response.body();
+        } catch (HttpTimeoutException e) {
+            throw new HttpTimeoutException("Request to Azure DevOps API timed out.");
+        }
+    }
+
+    public String getAzureUserIDByEmail(String userEmail, String token)
+            throws InvalidTokenException, UserNotFoundException, AzureDevOpsApiException, IOException, InterruptedException, URISyntaxException {
+        String analyticsUrl = analyticsOrganizationUrl
+                + "/_odata/v2.0/Users?$filter=UserEmail%20eq%20'"
+                + userEmail
+                + "'&$select=UserSK";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(analyticsUrl))
+                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((":" + token).getBytes()))
+                .header("Content-Type", "application/json")
+                .timeout(Duration.ofSeconds(10))
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 401) {
+                throw new InvalidTokenException("Token inválido ou expirado.");
+            }
+
+            if (response.statusCode() != 200) {
+                throw new AzureDevOpsApiException("Falha ao recuperar o AzureUserID: " + response.body());
+            }
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(response.body());
+            JsonNode valueNode = rootNode.path("value");
+
+            if (valueNode.isArray() && !valueNode.isEmpty()) {
+                String userSK = valueNode.get(0).path("UserSK").asText();
+                if (!userSK.isEmpty()) {
+                    return userSK;
+                }
+            }
+            throw new UserNotFoundException("Usuário não encontrado para o email fornecido.");
+        } catch (HttpTimeoutException e) {
+            throw new HttpTimeoutException("Request to Azure DevOps API timed out.");
+        }
+    }
+
+    public void updateWorkItem(int workItemId, String Query, Long userId, String board)
+            throws UserNotFoundException, InvalidTokenException, AzureDevOpsApiException, IOException, InterruptedException, URISyntaxException {
+        String wiqlUrl = organizationUrl + board
+                + "/_apis/wit/workitems/" + workItemId
+                + "?api-version=7.0";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(wiqlUrl))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(Query))
+                .header("Authorization", authenticator.getAuthHeaderById(userId))
+                .header("Content-Type", "application/json-patch+json")
+                .timeout(Duration.ofSeconds(10))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new AzureDevOpsApiException("Failed to execute WIQL query: " + response.body());
+        }
+    }
+
+    public static String UpdateWorkItemQueryCompletedAndRemaining(Double remainingWork, Double completedWork) {
+        return String.format(Locale.US, """
+            [
+                {
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.RemainingWork",
+                    "value": %.2f
+                },
+                {
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.CompletedWork",
+                    "value": %.2f
+                }
+            ]
+            """, remainingWork, completedWork);
+    }
+
+    public static String UpdateWorkItemQueryCompleted(Double completedWork) {
+        return String.format(Locale.US, """
+            [
+                {
+                    "op": "add",
+                    "path": "/fields/Microsoft.VSTS.Scheduling.CompletedWork",
+                    "value": %.2f
+                }
+            ]
+            """, completedWork);
+    }
+}
+
