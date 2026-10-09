@@ -113,7 +113,6 @@ sh mvnw spring-boot:run
 
 With Docker Compose, the database variables come from `POSTGRES_DB`, `POSTGRES_USER` and `POSTGRES_PASSWORD` in `.env` (see `.env.example`).
 
-Note: token encryption comes with the `feat/encrypt-stored-pats` change. Until it is merged, `PAT_ENCRYPTION_KEY` is passed to the container but not used.
 
 ## Testing
 

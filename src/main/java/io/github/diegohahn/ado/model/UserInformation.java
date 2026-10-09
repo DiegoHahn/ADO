@@ -2,7 +2,10 @@ package io.github.diegohahn.ado.model;
 
 import java.util.List;
 
+import io.github.diegohahn.ado.security.EncryptedTokenConverter;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,7 +31,9 @@ public class UserInformation {
     @Column
     private String board;
 
-    @Column (nullable = true)
+    // Stored encrypted (AES-GCM). See EncryptedTokenConverter.
+    @Convert(converter = EncryptedTokenConverter.class)
+    @Column(nullable = true, length = 512)
     private String token;
 
     @OneToMany(mappedBy = "userId")
