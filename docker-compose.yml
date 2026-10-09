@@ -1,0 +1,45 @@
+# Local development environment: PostgreSQL + ADO API.
+# Optional front end: `docker compose --profile front up --build`
+# (expects the ADOFront repository cloned next to this one, in ../ADOFront).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ado}
+      POSTGRES_USER: ${POSTGRES_USER:-ado}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ado}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-ado}
+      DB_USERNAME: ${POSTGRES_USER:-ado}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-ado}
+      ADO_ORGANIZATION_URL: ${ADO_ORGANIZATION_URL:-https://dev.azure.com/your-organization/}
+      ADO_ANALYTICS_ORGANIZATION_URL: ${ADO_ANALYTICS_ORGANIZATION_URL:-https://analytics.dev.azure.com/your-organization/}
+      PAT_ENCRYPTION_KEY: ${PAT_ENCRYPTION_KEY:-}
+    ports:
+      - "8080:8080"
+
+  front:
+    profiles: ["front"]
+    build: ../ADOFront
+    depends_on:
+      - api
+    ports:
+      - "4200:8080"
+
+volumes:
+  db-data:
