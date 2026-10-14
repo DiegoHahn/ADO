@@ -122,12 +122,6 @@ sh mvnw test
 
 Tests use an in-memory H2 database (`src/test/resources/application.properties`), so no PostgreSQL is needed. A JaCoCo report is written to `target/site/jacoco`.
 
-## Known limitations
-
-- There is no authentication between the front end and the API: users are identified by email only. It is meant for personal or local use.
-- The scheduler polls the database every 5 seconds instead of using a message queue.
-- CORS accepts any origin.
-
 ## Related
 
 - [ADOFront](https://github.com/DiegoHahn/ADOFront): Angular front end.
